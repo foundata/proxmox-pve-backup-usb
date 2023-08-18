@@ -25,6 +25,13 @@ Nothing special or automated yet. Therefore just some hints for a manual test:
    git show v<version>
    git push origin main --follow-tags
    ```
+5. Use [GitHub's release feature](https://github.com/foundata/proxmox-pve_backup_usb/releases/new), select the tag you pushed and create a new release:
+   * Use `v<version>` as title
+   * A description is optional. In doubt, use `See CHANGELOG.md for more information about this release.`
+6. Check if the GitHub API delivers the correct version as `latest`:
+   ```console
+   curl -s -L https://api.github.com/repos/foundata/proxmox-pve_backup_usb/releases/latest | jq -r '.tag_name' | sed -e 's/^v//g'
+   ```
 
 
 ## Miscellaneous
