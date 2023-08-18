@@ -17,6 +17,22 @@
 
 Simply place `pve_backup_usb.sh` where you like and make sure it is executable. `/usr/local/bin/pve_backup_usb.sh` is usually a good place.
 
+You might download the latest release via command line as follows:
+
+```bash
+# get current version
+version="$(curl -s -L https://api.github.com/repos/foundata/proxmox-pve_backup_usb/releases/latest | jq -r '.tag_name' | sed -e 's/^v//g')"
+printf '%s\n' "${version}"
+
+# download and check the file content
+curl -L "https://raw.githubusercontent.com/foundata/proxmox-pve_backup_usb/v${version}/pve_backup_usb.sh"  > "/usr/local/bin/pve_backup_usb.sh"
+cat "/usr/local/bin/pve_backup_usb.sh"
+
+# take care about owner and permissions
+chown "root:root" "/usr/local/bin/pve_backup_usb.sh"
+chmod 0755 "/usr/local/bin/pve_backup_usb.sh"
+```
+
 
 ## Usage
 

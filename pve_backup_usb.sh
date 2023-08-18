@@ -1,12 +1,21 @@
 #!/usr/bin/env bash
 
 ################################################################################
-# Simple backup script to mirror local Proxmox PVE dump backups to encrypted
-# external USB drives, including proper logging and optional email
-# notifications.
+# Script to mirror local Proxmox PVE dump backups to encrypted external USB
+# drives, including proper logging and optional email notifications.
 #
-# Repo and instructions: https://github.com/foundata/proxmox-pve_backup_usb
-# Author(s): Andreas Haerter <ah@foundata.com>
+# Repository:
+# https://github.com/foundata/proxmox-pve_backup_usb
+#
+# Further information:
+# https://github.com/foundata/proxmox-pve_backup_usb/blob/main/README.md
+#
+# License:
+# https://github.com/foundata/proxmox-pve_backup_usb/blob/main/LICENSE
+# https://github.com/foundata/proxmox-pve_backup_usb/blob/main/NOTICE
+#
+# Author(s):
+# Andreas Haerter <ah@foundata.com>
 ################################################################################
 
 
