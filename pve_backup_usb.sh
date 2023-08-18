@@ -18,67 +18,6 @@
 # this automatism presumes that only one USB disk is connected during the
 # script run. Defining a UUID will work when there are more (cf. -d parameter).
 #
-# An external USB drive has to be prepared by encrypting it with LUKS and
-# formatting it with a proper filesystem (e.g. EXT4 or XSF) including a
-# partition label. Full example of preparing a drive:
-#
-#   # config
-#   lsblk
-#   lsblk -l -p
-#   TARGETDEVICE='/dev/sdX' # adapt to point to your USB disk
-#   DEVICELABEL='pve_backup_usb' # 16 chars max
-#   MAPPERNAME="${DEVICELABEL}"
-#
-#   # get some infos about the drive
-#   hdparm -I "${TARGETDEVICE}"
-#
-#   # make sure predefined filesystems (new USB drives are usually shipped
-#   # with a filesystem).
-#   umount --force --recursive --all-targets "${TARGETDEVICE}"*
-#
-#   # Create partition and encrypt it. You might want to look at a current
-#   # system with disk encrytion which cryto default settings are en-vouge:
-#   #   dmsetup table ${deviceNameBelow/dev/mapper}
-#   #   cryptsetup luksDump ${device}
-#   parted "${TARGETDEVICE}" mktable GPT
-#   parted "${TARGETDEVICE}" mkpart primary 0% 100%
-#   cryptsetup luksFormat --cipher aes-xts-plain64 \
-#     --verify-passphrase "${TARGETDEVICE}1"
-#
-#   # Add an additional fallback keyA UUID of the target partition to decrypt.
-#   cryptsetup luksDump "${TARGETDEVICE}1"
-#   cryptsetup luksAddKey "${TARGETDEVICE}1"
-#   cryptsetup luksDump "${TARGETDEVICE}1"
-#
-#   # open and create mapping below /dev/mappper/${MAPPERNAME}
-#   cryptsetup open "${TARGETDEVICE}1" "${MAPPERNAME}"
-#   dmsetup ls --target crypt
-#
-#   # create EXT4 system, prevent lazy init to get full performance at
-#   # first use
-#   mkfs.ext4 \
-#     -E lazy_itable_init=0,lazy_journal_init=0 \
-#     -L "${DEVICELABEL}" "/dev/mapper/${MAPPERNAME}" && sync
-#
-#   # testmount
-#   tmpdirmnt="$(mktemp -d)"
-#   mount "/dev/mapper/${MAPPERNAME}" "${tmpdirmnt}"
-#   ls -la "${tmpdirmnt}"
-#   umount "/dev/mapper/${MAPPERNAME}" && sync
-#   cryptsetup luksClose "${MAPPERNAME}" && sync
-#   ls -l /dev/mapper
-#
-# Then place a keyfile containig the passphrase to unlock the disk:
-#
-#   mkdir -p /etc/credentials/luks/
-#   chmod 0770 /etc/credentials/
-#   chmod 0770 /etc/credentials/luks/
-#   $EDITOR /etc/credentials/luks/pve_backup_usb
-#   chmod 0660 /etc/credentials/luks/pve_backup_usb
-#
-#   # nothing(!) is allowed at the end of the file
-#   perl -pi -e 'chomp if eof' /etc/credentials/luks/pve_backup_usb
-#
 # Author(s): Andreas Haerter <ah@foundata.com>
 ################################################################################
 
