@@ -1,22 +1,7 @@
 ################################################################################
 # Simple backup script to mirror local Proxmox PVE dump backups to encrypted
-# USB drives, including proper logging and optional email notifications.
-#
-# The last N local PVE dumps of the machines you define are copied to an
-# encrypted USB driv. The script deletes the old content on the target
-# (afterwards, if there is enough space to copy the new files and keep the old
-# ones during copy operation or upfront if there is not enough space to keep
-# both).
-#
-# To keep multiple revisions of the last N PVE dumps, you simply have to use
-# multiple external drives and rotate (=disconnect, change, connect) them as
-# you wish.
-#
-# By default, the script is simply using the first partition on the first USB
-# disk it is able to find via /dev/disk/by-path/. No worries: existing drives
-# not used for backups won't be destroyed as the decryption will fail. But
-# this automatism presumes that only one USB disk is connected during the
-# script run. Defining a UUID will work when there are more (cf. -d parameter).
+# external USB drives, including proper logging and optional email
+# notifications.
 #
 # Author(s): Andreas Haerter <ah@foundata.com>
 ################################################################################
@@ -193,7 +178,7 @@ notifications.
 
 .SH DESCRIPTION
 See the inline documentation at the top of the script file for
-a detailled desciption.
+a detailled description.
 
 .SH OPTIONS
 .TP
@@ -1016,7 +1001,8 @@ do
     #
     # SHA1 was chosen as it is by far the fastest on large datasets (even faster then CRC32
     # and MD5) on modern hardware. This is especially true on CPUs like EPYC and RYZEN) we
-    # usually got on PVE hosts:
+    # usually got on PVE hosts. See the following for more information or to benchmark your
+    # machine:
     #   $ openssl speed md5 sha1
     #   https://stackoverflow.com/a/26682952
     # "sum" or "crc32" is also harder to handle as they do not provide built-in checking.
@@ -1116,7 +1102,7 @@ do
         # break on error
         if [ $exitcode_sha1sum -ne 0 ]
         then
-            endScript "Checksum verfication failed." "error"
+            endScript "Checksum verification failed." "error"
             exit 1 # endScript should exit, this is just a fallback
         fi
         unset exitcode_sha1sum

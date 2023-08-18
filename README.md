@@ -2,12 +2,12 @@
 
 **This project is *not* associated with the official [Proxmox Virtual Environment (PVE)](https://www.proxmox.com/en/proxmox-virtual-environment/overview) nor Proxmox Server Solutions GmbH.**
 
-`pve_backup_usb.sh` is a script for SOHO environments without dedicated [Proxmox Backup Server](https://www.proxmox.com/en/proxmox-backup-server/overview). It is a helps you to copy PVE dumps created by using the [built-in backup functionality](https://pve.proxmox.com/wiki/Backup_and_Restore) stored on a PVE Host on external, encrypted USB drives for easy rotation and offsite disaster backup. It has to be called by a cronjob.
+`pve_backup_usb.sh` is a script for SOHO environments without dedicated [Proxmox Backup Server](https://www.proxmox.com/en/proxmox-backup-server/overview). It is a helps you to copy PVE dumps (created by using the [built-in backup functionality](https://pve.proxmox.com/wiki/Backup_and_Restore) and stored on a PVE Host) to external, encrypted USB drives for offsite disaster backup. It has to be called by a cronjob.
 
 **Features:**
 
-* Easy to define which PVE dumps to copy (including limitations like „only the N-th newest ones of machine X“).
-* Is able to search in multiple backup source directories for PVE dumps.
+* Easy definition of which PVE dumps to copy (including limitation of „only the N-th newest ones of machine X“).
+* Able to use multiple backup source directories for PVE dumps.
 * Automatic mount and unmount of USB drive (including decryption / `cryptsetup open`).
 * Extensive output, syslog and optional mail notification (using the system's `mail`; please make sure a proper relay is configured).
 * Robust error handling and checks (e.g. available space on target and so on).
@@ -24,11 +24,15 @@ Simply place `pve_backup_usb.sh` where you like and make sure it is executable. 
 
 Call `pve_backup_usb.sh -h` or look at the help text in the [source code](./pve_backup_usb.sh) for a description of all parameters.
 
+The script deletes the old backup content on the target device (afterwards, if there is enough space to copy the new files and keep the old ones during copy operation or upfront if there is not enough space to keep both). To keep multiple revisions of the last N PVE dumps, you simply have to use multiple external drives and rotate them as you wish (=disconnect old drive, change and connect new drive).
+
+By default, the script is simply using the first partition on the first USB disk it is able to find via /dev/disk/by-path/. No worries: existing drives not used for backups won't be destroyed as the decryption will fail. But this automatism presumes that only one USB disk is connected during the script run. Defining a UUID will work when there are more (cf. `-d` parameter).
+
 
 
 ## Cronjob example
 
-You might want to place something like this via `crontab -e` in the crontab of `root`:
+The easiest way of getting a rotation sch place something like this via `crontab -e` in the crontab of `root`:
 
 ```
 19 0 * * Sat  /usr/local/bin/pve_backup_usb.sh -b "10:1,22:4,333" -s "/mnt/backup1/dump:/mnt/backup2/dump" -c -e "it@example.com" -g "admin2@example.com,admin3@example.com" > /dev/null 2>&1
@@ -52,10 +56,10 @@ Explanation:
 
 An external USB drive has to be prepared before using it as storage target for PVE dump copies:
 
-1. Partition the disk with one primary partion and a GPT partitioning table
-2. Encrypt it with LUKS
+1. Add a GPT partitioning table and one primary partition for the whole disk.
+2. Encrypt it with LUKS.
 3. Format the partition with a filesystem (e.g. EXT4 or XSF).
-4. Place a keyfile with the LUKS passphrase on the PVE host for automatic opening of the device for backups
+4. Place a keyfile with the LUKS passphrase on the PVE host for automatic opening of the device for backups.
 
 Full example of preparing a drive:
 
@@ -70,6 +74,7 @@ DEVICELABEL='pve_backup_usb' # 16 chars max
 MAPPERNAME="${DEVICELABEL}"
 
 # get some infos about the drive
+apt-get install hdparm
 hdparm -I "${TARGETDEVICE}"
 
 # make sure predefined filesystems are not mounte (new USB drives are
