@@ -13,11 +13,9 @@
 * Robust error handling and checks (e.g. available space on target and so on).
 
 
-
 ## Installation
 
 Simply place `pve_backup_usb.sh` where you like and make sure it is executable. `/usr/local/bin/pve_backup_usb.sh` is usually a good place.
-
 
 
 ## Usage
@@ -29,10 +27,9 @@ The script deletes the old backup content on the target device (afterwards, if t
 By default, the script is simply using the first partition on the first USB disk it is able to find via /dev/disk/by-path/. No worries: existing drives not used for backups won't be destroyed as the decryption will fail. But this automatism presumes that only one USB disk is connected during the script run. Defining a UUID will work when there are more (cf. `-d` parameter).
 
 
+### Cronjob example
 
-## Cronjob example
-
-The easiest way of getting a rotation sch place something like this via `crontab -e` in the crontab of `root`:
+The easiest way for getting a rotation in place is a cronjob. For example, place something like the following via `crontab -e` in the crontab of `root`:
 
 ```
 19 0 * * Sat  /usr/local/bin/pve_backup_usb.sh -b "10:1,22:4,333" -s "/mnt/backup1/dump:/mnt/backup2/dump" -c -e "it@example.com" -g "admin2@example.com,admin3@example.com" > /dev/null 2>&1
@@ -40,7 +37,7 @@ The easiest way of getting a rotation sch place something like this via `crontab
 
 Explanation:
 
-* `19 0 * * Sat  /usr/local/bin/pve_backup_usb.sh`: Run on every Saturday at 19:00 o'clock
+* `19 0 * * Sat  /usr/local/bin/pve_backup_usb.sh`: Run on [every Saturday at 19:00 o'clock](https://crontab.guru/#19_0_*_*_Sat).
 * `-b "10:1,22:4,333"`: Handling backups of
   * machine with PVE ID `10`: Only the last backup (if there are more, they will be ignored)
   * machine with PVE ID `22`: Only the last four backups (if there are more, they will be ignored)
@@ -51,8 +48,7 @@ Explanation:
 * `-g`: emails (CC) the backup report to `it@example.com`
 
 
-
-## Preparation of an external USB drive
+### Preparation of an external USB drive
 
 An external USB drive has to be prepared before using it as storage target for PVE dump copies:
 
@@ -143,3 +139,12 @@ cryptsetup open --key-file "/etc/credentials/luks/pve_backup_usb" "${TARGETDEVIC
 ls -l "/dev/mapper/pve_backup_usb"
 cryptsetup luksClose "pve_backup_usb"
 ```
+
+## License, copyright
+
+This project is under [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0). See [`LICENSE`](./LICENSE) and [`NOTICE`](./NOTICE) for details.
+
+
+## Author information
+
+This project was created and is maintained by [foundata](https://foundata.com/). If you like it, you might [buy them a coffee](https://buy-me-a.coffee/proxmox-pve_backup_usb/).
