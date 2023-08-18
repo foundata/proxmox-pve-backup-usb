@@ -1,8 +1,11 @@
+#!/usr/bin/env bash
+
 ################################################################################
 # Simple backup script to mirror local Proxmox PVE dump backups to encrypted
 # external USB drives, including proper logging and optional email
 # notifications.
 #
+# Repo and instructions: https://github.com/foundata/proxmox-pve_backup_usb
 # Author(s): Andreas Haerter <ah@foundata.com>
 ################################################################################
 
@@ -385,6 +388,16 @@ endScript() {
     # create syslog entry
     syslog "${message}" "${type}"
 
+    # copy logfile beside the other files and clean up afterwards
+    if [ -f "${logfile_path}" ]
+    then
+        if [ -d "${target_mountpoint_path}/${target_subdir}" ]
+        then
+            cp -f "${logfile_path}" "${target_mountpoint_path}/${target_subdir}/$(basename "${0}").log" > /dev/null 2>&1
+        fi
+        rm -f "${logfile_path}" > /dev/null 2>&1
+    fi
+
     # clean up
     syncUmountAndClose
 
@@ -396,11 +409,6 @@ endScript() {
     fi
     sendEmail "${mailmessage}" "${type}"
     unset mailmessage
-
-    if [ -f "${logfile_path}" ]
-    then
-        rm -f "${logfile_path}" > /dev/null 2>&1
-    fi
 
     if [ "${type}" = "error" ]
     then
@@ -723,7 +731,7 @@ fi
 if ! [ -d "${target_mountpoint_path}" ] ||
    ! [ -n "$(find "${target_mountpoint_path}" -maxdepth 0 -empty -exec echo {} is empty. \; 2>/dev/null)" ]
 then
-    endScript "Mount point for taget disk is no directory or not empty: '${target_mountpoint_path}'." "error"
+    endScript "Mount point for target disk is no directory or not empty: '${target_mountpoint_path}'." "error"
     exit 1 # endScript should exit, this is just a fallback
 fi
 
@@ -865,7 +873,13 @@ do
             message "Skipped backup '${tuple[0]}' as max backup count ${cfg_maxLastCopies} for ID '${cfg_pve_id}' was reached."
         fi
     done
-    unset item tuple addedCopies
+    unset item tuple
+
+    if [  $(($addedCopies+0)) -eq 0 ]
+    then
+        message "There are no backups to add to the list for ID '${cfg_pve_id}'."
+    fi
+    unset addedCopies
 done
 unset cfg_pve_id cfg_maxLastCopies tuple
 
@@ -909,7 +923,7 @@ then
     if [ -d "${target_mountpoint_path}/${target_subdir_old}" ]
     then
         # fallback if last clean-up operation was not successful
-        message "There is arleady old backup data at '${target_mountpoint_path}/${target_subdir_old}', going to delete it..."
+        message "There is already old backup data at '${target_mountpoint_path}/${target_subdir_old}', going to delete it..."
         rm -rf "${target_mountpoint_path}/${target_subdir_old}" > /dev/null 2>&1
     fi
     if mv -f "${target_mountpoint_path}/${target_subdir}" "${target_mountpoint_path}/${target_subdir_old}" > /dev/null 2>&1
@@ -977,7 +991,9 @@ unset time_elapsed
 # handle the files
 if [ ${#backup_sources_cp[@]} -eq 0 ]
 then
-    endScript "There were no backups to mirror to '${target_mountpoint_path}'." "success"
+    message ""
+    message "No backups found. Please check if the machine IDs (parameter '-b') and source directories (parameter '-s') are correct."
+    endScript "There were no backups to mirror to '${target_mountpoint_path}'." "error"
     exit 0 # endScript should exit, this is just a fallback
 fi
 if ! mountpoint -q "${target_mountpoint_path}" > /dev/null 2>&1
@@ -998,11 +1014,9 @@ do
     message "#### Handling backup '$(basename "${source_item}")' ####"
 
     # create checksums
-    #
-    # SHA1 was chosen as it is by far the fastest on large datasets (even faster then CRC32
-    # and MD5) on modern hardware. This is especially true on CPUs like EPYC and RYZEN) we
-    # usually got on PVE hosts. See the following for more information or to benchmark your
-    # machine:
+    # SHA1 was chosen as it is by far the fastest on large datasets (even faster than CRC32
+    # and MD5) on modern hardware. This is especially true on CPUs like AMD EPYC or RYZEN).
+    # See the following for more information or to benchmark your machine:
     #   $ openssl speed md5 sha1
     #   https://stackoverflow.com/a/26682952
     # "sum" or "crc32" is also harder to handle as they do not provide built-in checking.
@@ -1123,10 +1137,10 @@ message "All file operations were finished successfully."
 unset source_item
 
 
-# backup was sucessful, clean up old backup data (best effort)
+# backup was successful, clean up old backup data now (best effort)
 if [ -d "${target_mountpoint_path}/${target_subdir_old}" ]
 then
-    message "Going to clean up the old backup at '${target_mountpoint_path}/${target_subdir_old}' data on the target device."
+    message "Going to clean up the old backup data at '${target_mountpoint_path}/${target_subdir_old}'."
     rm -rf "${target_mountpoint_path}/${target_subdir_old}" 2>/dev/null
 fi
 
@@ -1138,6 +1152,7 @@ then
     time_elapsed="$(printf '%02dh:%02dm:%02ds\n' $((time_elapsed/3600)) $((time_elapsed%3600/60)) $((time_elapsed%60)))"
     time_elapsed=" Elapsed time: ${time_elapsed}."
 fi
+
 
 endScript "Mirroring backups to '${target_mountpoint_path}' was successful.${time_elapsed}" "success"
 exit 0 # endScript should exit, this is just a fallback
