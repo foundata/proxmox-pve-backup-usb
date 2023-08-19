@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nothing worth mentioning yet.
 
 
+## [1.0.1] - 2023-08-19
+
+### Fixed
+
+- Fix help (`-h`) output and improve descriptions.
+
+
 ## [1.0.0] - 2023-08-19
 
 ### Added
@@ -18,5 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All functionality and files.
 
 
-[unreleased]: https://github.com/foundata/proxmox-pve_backup_usb/compare/v1.0.0...HEAD
+[unreleased]: https://github.com/foundata/proxmox-pve_backup_usb/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/foundata/proxmox-pve_backup_usb/releases/tag/v1.0.1
 [1.0.0]: https://github.com/foundata/proxmox-pve_backup_usb/releases/tag/v1.0.0
