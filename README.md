@@ -6,11 +6,11 @@
 
 **Features:**
 
-* Easy definition of which PVE dumps to copy (including limitation of „only the N-th newest ones of machine X“).
-* Able to use multiple backup source directories for PVE dumps.
-* Automatic mount and unmount of USB drive (including decryption / `cryptsetup open`).
+* Easy selection of PVE dumps to copy (including limitation of „only the N newest ones of machine X“).
+* Can search multiple backup source directories for PVE dumps.
+* Automatic search of USB drive, mount including decryption / `cryptsetup open`.
 * Extensive output, syslog and optional mail notification (using the system's `mail`; please make sure a proper relay is configured).
-* Robust error handling and checks (e.g. available space on target and so on).
+* Robust error handling and checks (e.g. available space on target, prevent parallel execution and so on).
 
 
 ## Installation
@@ -20,12 +20,20 @@ Simply place `pve_backup_usb.sh` where you like and make sure it is executable. 
 You might download the latest release via command line as follows:
 
 ```bash
-# get current version
+
+# install dependencies (usually, all except of hdparm should be
+# already installed on a common PVE host)
+apt-get install coreutils hdparm lsof util-linux
+
+# get latest version
+apt-get install jq
 version="$(curl -s -L https://api.github.com/repos/foundata/proxmox-pve_backup_usb/releases/latest | jq -r '.tag_name' | sed -e 's/^v//g')"
 printf '%s\n' "${version}"
 
-# download and check the file content
+# download
 curl -L "https://raw.githubusercontent.com/foundata/proxmox-pve_backup_usb/v${version}/pve_backup_usb.sh"  > "/usr/local/bin/pve_backup_usb.sh"
+
+# check the file content (it still is a file you've just downloaded from the internet)
 cat "/usr/local/bin/pve_backup_usb.sh"
 
 # take care about owner and permissions
