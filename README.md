@@ -13,6 +13,16 @@
 * Robust error handling and checks (e.g. available space on target, prevent parallel execution and so on).
 
 
+## Table of Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Cronjob example](#cronjob-example)
+  - [Preparation of an external USB drive](#preparation-of-an-external-usb-drive)
+- [License, copyright](#license-copyright)
+- [Author information](#author-information)
+
+
 ## Installation
 
 Simply place `pve_backup_usb.sh` where you like and make sure it is executable. `/usr/local/bin/pve_backup_usb.sh` is usually a good place.
@@ -33,7 +43,7 @@ printf '%s\n' "${version}"
 # download
 curl -L "https://raw.githubusercontent.com/foundata/proxmox-pve_backup_usb/v${version}/pve_backup_usb.sh"  > "/usr/local/bin/pve_backup_usb.sh"
 
-# check the file content (it still is a file you've just downloaded from the internet)
+# check the content (you've just downloaded a file from the internet :-D)
 cat "/usr/local/bin/pve_backup_usb.sh"
 
 # take care about owner and permissions
@@ -59,7 +69,7 @@ Explanation:
   * machine with PVE ID `22`: Only the last four backups (if there are more, they will be ignored)
   * machine with PVE ID `333`: All existing backups
 * Search in `/mnt/backup1/dump` and `/mnt/backup2/dump` for backups
-* `-c`: Create a checksums file and verifies the backup copies afterwards
+* `-c`: Create a checksums file and verify the backup copies afterwards
 * `-e`: email the backup report to `it@example.com`
 * `-g`: email the backup report (as CC) to `admin2@example.com` and `admin3@example.com`
 
@@ -69,10 +79,10 @@ Description of available parameters:
 **Mandatory:**
 
 * `-b`: Defines which PVE dumps of will be copied. The format is a CSV list of `PveID:maxCount` value tuples where `:maxCount` is optional. All backups for `PveId` will be copied if `:maxCount` is not given. Example: The value `123:2,456:4,789` will copy
-  1. the last two backups of machine `123`
-  2. the last four backups machine `456`
-  3. all backups of machine `789`
-* `-s`: List of one or more directories to search for PVE dumps, without trailing slash, , separated by `:`. Examples: `/path/to/pve/dumps` or `/pve1/dumps:/pve2/dumps`.
+  * the last two backups of machine `123`
+  * the last four backups machine `456`
+  * all backups of machine `789`
+* `-s`: List of one or more directories to search for PVE dumps, without trailing slash, separated by `:`. Examples: `/path/to/pve/dumps` or `/pve1/dumps:/pve2/dumps`.
 
 **Quite important, but optional**
 

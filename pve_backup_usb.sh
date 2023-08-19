@@ -204,7 +204,7 @@ c) all backups of machine "789"
 .TP
 .B -c
 Enable checksum creation and verification of the copies (recommended for
-safety but propably doubles the time needed  for completing the task).
+safety but propably doubles the time needed for completing the backup task).
 .TP
 .B -d
 A UUID of the target partition to decrypt. Will be used to search it in

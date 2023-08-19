@@ -5,7 +5,7 @@ This file provides additional information for maintainers and contributors.
 
 ## Testing
 
-Nothing special or automated yet. Therefore just some hints for a manual test:
+Nothing special or automated yet. Therefore just some hints for a manual testing:
 
 * Run the script with invalid values.
 * Run the script with technically valid values but PVE IDs of non-existing machines.
