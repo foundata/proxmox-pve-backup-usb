@@ -169,9 +169,8 @@ do
             mantext="$(cat <<-DELIM
 .TH ${filename} 1
 .SH NAME
-${filename} - Simple script to mirror local Proxmox PVE dump backups
-to encrypted USB drives, including proper logging and optional email
-notifications.
+${filename} - Script to mirror local Proxmox PVE dump backups to encrypted
+USB drives, including proper logging and optional email notifications.
 
 .SH SYNOPSIS
 .B ${filename}
@@ -189,8 +188,8 @@ notifications.
 .B [-q]
 
 .SH DESCRIPTION
-See the inline documentation at the top of the script file for
-a detailled description.
+See https://github.com/foundata/proxmox-pve_backup_usb/blob/ for a detailled
+description.
 
 .SH OPTIONS
 .TP
