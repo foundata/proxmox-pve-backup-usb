@@ -91,12 +91,12 @@ By default, the script is simply using the first partition on the first USB disk
 The easiest way for getting a rotation in place and use this script is a cronjob. For example, place something like the following via `crontab -e` in the crontab of `root`:
 
 ```
-19 0 * * Sat  /usr/local/bin/pve_backup_usb.sh -b "10:1,22:4,333" -s "/mnt/backup1/dump:/mnt/backup2/dump" -c -e "it@example.com" -g "admin2@example.com,admin3@example.com" > /dev/null 2>&1
+0 19 * * Sat  /usr/local/bin/pve_backup_usb.sh -b "10:1,22:4,333" -s "/mnt/backup1/dump:/mnt/backup2/dump" -c -e "it@example.com" -g "admin2@example.com,admin3@example.com" > /dev/null 2>&1
 ```
 
 Explanation:
 
-* `19 0 * * Sat  /usr/local/bin/pve_backup_usb.sh`: Run on [every Saturday at 19:00 o'clock](https://crontab.guru/#19_0_*_*_Sat).
+* `0 19 * * Sat  /usr/local/bin/pve_backup_usb.sh`: Run on [every Saturday at 19:00 o'clock](https://crontab.guru/#0_19_*_*_Sat).
 * `-b "10:1,22:4,333"`: Handling backups of
   * machine with PVE ID `10`: Only the last backup (if there are more, they will be ignored)
   * machine with PVE ID `22`: Only the last four backups (if there are more, they will be ignored)
