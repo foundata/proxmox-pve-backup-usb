@@ -36,11 +36,54 @@ chmod 0755 "/usr/local/bin/pve_backup_usb.sh"
 
 ## Usage
 
-Call `pve_backup_usb.sh -h` or look at the help text in the [source code](./pve_backup_usb.sh) for a description of all parameters.
+Example call:
+
+```bash
+pve_backup_usb.sh \
+  -b "10:1,22:4,333" -s "/mnt/backup1/dump:/mnt/backup2/dump" \
+  -c -e "it@example.com" -g "admin2@example.com,admin3@example.com"
+```
+
+Explanation:
+
+* `-b "10:1,22:4,333"`: Handling backups of
+  * machine with PVE ID `10`: Only the last backup (if there are more, they will be ignored)
+  * machine with PVE ID `22`: Only the last four backups (if there are more, they will be ignored)
+  * machine with PVE ID `333`: All existing backups
+* Search in `/mnt/backup1/dump` and `/mnt/backup2/dump` for backups
+* `-c`: Create a checksums file and verifies the backup copies afterwards
+* `-e`: email the backup report to `it@example.com`
+* `-g`: email the backup report (as CC) to `admin2@example.com` and `admin3@example.com`
+
+
+Description of available parameters:
+
+**Mandatory:**
+
+* `-b`: Defines which PVE dumps of will be copied. The format is a CSV list of `PveID:maxCount` value tuples where `:maxCount` is optional. All backups for `PveId` will be copied if `:maxCount` is not given. Example: The value `123:2,456:4,789` will copy
+  1. the last two backups of machine `123`
+  2. the last four backups machine `456`
+  3. all backups of machine `789`
+* `-s`: List of one or more directories to search for PVE dumps, without trailing slash, , separated by `:`. Examples: `/path/to/pve/dumps` or `/pve1/dumps:/pve2/dumps`.
+
+**Quite important, but optional**
+
+* `-c`: Flag to enable checksum creation and verification of the copies (recommended for safety but propably doubles the time needed for completing the task).
+* `-e`: Email address to send notifications to. Format: `email@example.com`. Has to be set for sending mails. This script is using the system's `mail` command, so please make sure a proper relay is configured.
+* `-g`: Email address(es) to send notifications to (CC). Format: `email@example.com`. Separate multiple addresses via comma (CSV list).
+
+**Miscellaneous, optional**
+
+* `-d`: A UUID of the target partition to decrypt. Will be used to search it in `/dev/disk/by-uuid/` (you might use `blkid /dev/sdX1` to determine the UUID). By default, the script is simply using the first partition on the first USB disk it is able to find via `/dev/disk/by-path/`. No worries: existing drives not used for backups won't be destroyed as the decryption will fail. But this automatism presumes that only one USB disk is connected during the script run. Defining a UUID will work if there are more than one (e.g. when it is not feasible in your environment to just have one disk connected simultaneously).
+* `-h`: Flag to print help.
+* `-k`: Path to a keyfile containing a passphrase to unlock the target device. Defaults to `/etc/credentials/luks/pve_backup_usb`. There must be no other chars beside the passphrase, including no trailing new line or [`EOF`](https://en.wikipedia.org/wiki/End-of-file). You might use `perl -pi -e 'chomp if eof' /etc/credentials/luks/pve_backup_usb` to get rid of an invisible, unwanted `EOF`.
+* `-l`: Name used for handling LUKS via `/dev/mapper/` and creating a mountpoint subdirectory at `/media/`. Defaults to `pve_backup_usb`. 16 alphanumeric chars at max.
+* `-q`: Flag to enable quiet mode. Emails will be sent only on error then.
+* `-u`: Username of the account used to run the backups. Defaults to `root`. The script checks if the correct user is calling it and permissions of e.g. the keyfile are fitting or are too permissive. The user also needs permissions to mount devices. Running the script as `root`` is propably a good choice for most environments.
 
 The script deletes the old backup content on the target device (afterwards, if there is enough space to copy the new files and keep the old ones during copy operation or upfront if there is not enough space to keep both). To keep multiple revisions of the last N PVE dumps, you simply have to use multiple external drives and rotate them as you wish (=disconnect old drive, change and connect new drive).
 
-By default, the script is simply using the first partition on the first USB disk it is able to find via /dev/disk/by-path/. No worries: existing drives not used for backups won't be destroyed as the decryption will fail. But this automatism presumes that only one USB disk is connected during the script run. Defining a UUID will work when there are more (cf. `-d` parameter).
+By default, the script is simply using the first partition on the first USB disk it is able to find via `/dev/disk/by-path/`. No worries: existing drives not used for backups won't be destroyed as the decryption will fail. But this automatism presumes that only one USB disk is connected during the script run. Defining a UUID will work when there are more (cf. `-d` parameter).
 
 
 ### Cronjob example
@@ -58,10 +101,10 @@ Explanation:
   * machine with PVE ID `10`: Only the last backup (if there are more, they will be ignored)
   * machine with PVE ID `22`: Only the last four backups (if there are more, they will be ignored)
   * machine with PVE ID `333`: All existing backups
-* Searching in `/mnt/backup1/dump` and `/mnt/backup2/dump` for backups
+* Search in `/mnt/backup1/dump` and `/mnt/backup2/dump` for backups
 * `-c`: Create a checksums file and verifies the backup copies afterwards
-* `-e`: emails the backup report to `it@example.com`
-* `-g`: emails (CC) the backup report to `it@example.com`
+* `-e`: email the backup report to `it@example.com`
+* `-g`: email the backup report (as CC) to `admin2@example.com` and `admin3@example.com`
 
 
 ### Preparation of an external USB drive

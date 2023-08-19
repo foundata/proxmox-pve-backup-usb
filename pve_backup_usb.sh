@@ -195,55 +195,70 @@ a detailled description.
 .SH OPTIONS
 .TP
 .B -b
-Defines which backups of wich PVE dumps will be copied. Format:
-A CSV list of "PveId:maxCount" value tuples. ":maxCount" is
-optional, all backups for PveId will be copied if maxCount is not
-given. Example: "123:2,456:4,789" will copy the last two backups
-of machine 123, the last four of machine 456 and all of machine
-789.
+Defines which PVE dumps of will be copied. The format is a CSV list of
+"PveID:maxCount" value tuples where ":maxCount" is optional. All backups
+for "PveId" will be copied if ":maxCount" is not given. Example: The value
+"123:2,456:4,789" will copy
+a) the last two backups of machine "123"
+b) the last four backups machine "456"
+c) all backups of machine "789"
 .TP
 .B -c
-Enable checksum creation and verification of the copies (recommended
-for safety but propably doubles the the time needed).
+Enable checksum creation and verification of the copies (recommended for
+safety but propably doubles the time needed  for completing the task).
+.TP
 .B -d
-A UUID of the target partition to decrypt. Will be used to search
-it in /dev/disk/by-uuid/ (you might use 'blkid /dev/sdX1' to
-determine the UUID). By default, the script is simply using the
-first partition on the first USB disk it is able to find via
-/dev/disk/by-path/. No worries: existing drives not used for
-backups won't be destroyed as the decryption will fail. But this
+A UUID of the target partition to decrypt. Will be used to search it in
+/dev/disk/by-uuid/ (you might use 'blkid /dev/sdX1' to determine the UUID).
+By default, the script is simply using the first partition on the first USB
+disk it is able to find via /dev/disk/by-path/. No worries: existing drives
+not used for backups won't be destroyed as the decryption will fail. But this
 automatism presumes that only one USB disk is connected during the
-script run. Defining a UUID will work when there are more.
+script run. Defining a UUID will work if there are more than one (e.g. when it
+is not feasible in your environment to just have one disk connected
+simultaneously).
+.TP
 .B -e
 Email address to send notifications to. Format: 'email@example.com'.
-Has to be set for sending mails.
+Has to be set for sending mails. This script is using the system's "mail"
+command, so please make sure a proper relay is configured.
+.TP
 .B -f
 Email address to send notifications from. Format: 'email@example.com'.
 Has to be set for sending mails. Defaults to "do-not-reply@$(hostname -d)".
+.TP
 .B -g
 Email address(es) to send notifications to (CC). Format: 'email@example.com'.
 Separate multiple addresses via comma (CSV list).
+.TP
 .B -k
-Path to a keyfile containing a passphrase to unlock the target
-device. Defaults to "/etc/credentials/luks/pve_backup_usb".
+Path to a keyfile containing a passphrase to unlock the target device. Defaults
+to "/etc/credentials/luks/pve_backup_usb". There must be no other chars beside
+the passphrase, including no trailing new line or EOF. You might use
+"perl -pi -e 'chomp if eof' /etc/credentials/luks/pve_backup_usb` to get rid of
+an invisible, unwanted EOF.
+.TP
 .B -l
-Name used for handling LUKS via /dev/mapper/ and creating a
-mountpoint subdir with this name at /media/. Defaults to
-"pve_backup_usb". 16 alphanumeric chars at max.
+Name used for handling LUKS via /dev/mapper/ and creating a mountpoint
+subdirectory at /media/. Defaults to "pve_backup_usb".
+16 alphanumeric chars at max.
+.TP
 .B -s
-List of one or more directories to search for PVE dumps, separated
-by ":"; without trailing slash. Example: "/pve1/dumps:/pve2/dumps".
+List of one or more directories to search for PVE dumps, without trailing
+slash, separated by ":"; Example: "/pve1/dumps:/pve2/dumps".
+.TP
 .B -u
-Username of the account used to run the backups. Defaults to "root".
-This script checks if the correct user is calling the script and
-permission to e.g. the keyfile and sources are fitting for this
-user.
+Username of the account used to run the backups. Defaults to "root". This
+script checks if the correct user is calling it and permissions of e.g. the
+keyfile are fitting or are too permissive. The user also needs permissions
+to mount devices. Running the script as "root" is propably a good choice
+for most environments.
 .TP
 .B -h
 Print this help.
 .TP
 .B -q
-Enable quiet mode: emails will be sent only on error.
+Flag to enable quiet mode. Emails will be sent only on error then.
 
 
 .SH EXIT STATUS
