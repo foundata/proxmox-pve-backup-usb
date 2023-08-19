@@ -235,7 +235,7 @@ Separate multiple addresses via comma (CSV list).
 Path to a keyfile containing a passphrase to unlock the target device. Defaults
 to "/etc/credentials/luks/pve_backup_usb". There must be no other chars beside
 the passphrase, including no trailing new line or EOF. You might use
-"perl -pi -e 'chomp if eof' /etc/credentials/luks/pve_backup_usb` to get rid of
+"perl -pi -e 'chomp if eof' /etc/credentials/luks/pve_backup_usb" to get rid of
 an invisible, unwanted EOF.
 .TP
 .B -l
