@@ -2,7 +2,7 @@
 
 **This project is *not* associated with the official [Proxmox Virtual Environment (PVE)](https://www.proxmox.com/en/proxmox-virtual-environment/overview) nor Proxmox Server Solutions GmbH.**
 
-`pve_backup_usb.sh` is a script for SOHO environments without dedicated [Proxmox Backup Server](https://www.proxmox.com/en/proxmox-backup-server/overview). It is a helps you to copy PVE dumps (created by using the [built-in backup functionality](https://pve.proxmox.com/wiki/Backup_and_Restore) and stored on a PVE Host) to external, encrypted USB drives for offsite disaster backup. It has to be called by a cronjob.
+`pve_backup_usb.sh` is a script for smaller environments without dedicated [Proxmox Backup Server](https://www.proxmox.com/en/proxmox-backup-server/overview). It helps you to copy PVE dumps (created by using the [built-in backup functionality](https://pve.proxmox.com/wiki/Backup_and_Restore) stored on a PVE Host) to external, encrypted USB drives for offsite disaster backup.
 
 **Features:**
 
@@ -88,7 +88,7 @@ By default, the script is simply using the first partition on the first USB disk
 
 ### Cronjob example
 
-The easiest way for getting a rotation in place is a cronjob. For example, place something like the following via `crontab -e` in the crontab of `root`:
+The easiest way for getting a rotation in place and use this script is a cronjob. For example, place something like the following via `crontab -e` in the crontab of `root`:
 
 ```
 19 0 * * Sat  /usr/local/bin/pve_backup_usb.sh -b "10:1,22:4,333" -s "/mnt/backup1/dump:/mnt/backup2/dump" -c -e "it@example.com" -g "admin2@example.com,admin3@example.com" > /dev/null 2>&1
