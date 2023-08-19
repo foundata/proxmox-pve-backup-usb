@@ -25,6 +25,12 @@ Nothing special or automated yet. Therefore just some hints for a manual test:
    git show v<version>
    git push origin main --follow-tags
    ```
+   If something minor went wrong (like missing `CHANGELOG.md` update), delete the tag and start over:
+   ```console
+   git tag -d v<version>                 # delete the old tag locally
+   git push origin :refs/tags/v<version> # delete the old tag remotely
+   ```
+   This is *only* possible if there was no [GitHub release](https://github.com/foundata/proxmox-pve_backup_usb/releases/). Use a new patch version number otherwise.
 5. Use [GitHub's release feature](https://github.com/foundata/proxmox-pve_backup_usb/releases/new), select the tag you pushed and create a new release:
    * Use `v<version>` as title
    * A description is optional. In doubt, use `See CHANGELOG.md for more information about this release.`
