@@ -19,13 +19,16 @@
 - [Usage](#usage)
   - [Cronjob example](#cronjob-example)
   - [Preparation of an external USB drive](#preparation-of-an-external-usb-drive)
+  - [Logging](#logging)
+    - [Logfile](#logfile)
+    - [systemd journal](#systemd-journal)
 - [License, copyright](#license-copyright)
 - [Author information](#author-information)
 
 
 ## Installation
 
-Simply place `pve_backup_usb.sh` where you like and make sure it is executable. `/usr/local/bin/pve_backup_usb.sh` is usually a good place.
+Simply store [`pve_backup_usb.sh`](./pve_backup_usb.sh) where you like and make it executable. `/usr/local/bin/pve_backup_usb.sh` is usually a good place.
 
 You might download the latest release via command line as follows:
 
@@ -150,30 +153,33 @@ MAPPERNAME="${DEVICELABEL}"
 apt-get install hdparm
 hdparm -I "${TARGETDEVICE}"
 
-# make sure predefined filesystems are not mounte (new USB drives are
-# usually shipped with a filesystem).
+# make sure predefined filesystems are currently not mounted (new USB drives
+# are usually shipped with a filesystem).
 umount --force --recursive --all-targets "${TARGETDEVICE}"*
 
-# Create a partition and encrypt it. You might want to look at a current
-# system with disk encryption which crypto default settings are en-vouge:
-#
-#   dmsetup table ${deviceNameBelow/dev/mapper}
-#   cryptsetup luksDump ${device}
+# Create a partition and encrypt it.
 #
 # Please use a long passphrase (at least 20 chars) for security and store
 # it in your password management. You do not have to type it anywhere,
 # the script will grab it from a keyfile later.
+#
+# You might want to look at a current system with disk encryption which crypto
+# default settings are en-vouge:
+#   dmsetup table ${deviceNameBelow/dev/mapper}
+#   cryptsetup luksDump ${device}
+# As of 2023 "aes-xts-plain64" should be a good choice.
 apt-get install parted
 parted "${TARGETDEVICE}" mktable GPT
 parted "${TARGETDEVICE}" mkpart primary 0% 100%
 cryptsetup luksFormat --cipher aes-xts-plain64 --verify-passphrase "${TARGETDEVICE}1"
 
-# optional: add an additional fallback key
+# optional: add an additional fallback key. Please use a long passphrase (at least
+# 20 chars) for security and store it in your password management.
 cryptsetup luksDump "${TARGETDEVICE}1"
 cryptsetup luksAddKey "${TARGETDEVICE}1"
 cryptsetup luksDump "${TARGETDEVICE}1"
 
-# open, access possible via /dev/mappper/${MAPPERNAME} afterwards
+# open and list, access possible via /dev/mappper/${MAPPERNAME} afterwards
 cryptsetup open "${TARGETDEVICE}1" "${MAPPERNAME}"
 dmsetup ls --target "crypt"
 
@@ -182,11 +188,13 @@ mkfs.ext4 \
   -E lazy_itable_init=0,lazy_journal_init=0 \
   -L "${DEVICELABEL}" "/dev/mapper/${MAPPERNAME}" && sync
 
-# testmount and close
+# test mount
 tmpdirmnt="$(mktemp -d)"
 mount "/dev/mapper/${MAPPERNAME}" "${tmpdirmnt}"
 ls -la "${tmpdirmnt}"
 
+# close and cleanup (the drive is ready for usage afterwards and/or
+# can be disconnected now)
 umount "/dev/mapper/${MAPPERNAME}" && sync
 cryptsetup luksClose "${MAPPERNAME}" && sync
 ```
@@ -216,6 +224,50 @@ cryptsetup open --key-file "/etc/credentials/luks/pve_backup_usb" "${TARGETDEVIC
 ls -l "/dev/mapper/pve_backup_usb"
 cryptsetup luksClose "pve_backup_usb"
 ```
+
+
+### Logging
+
+#### Logfile
+
+The detailled logfile of a copy operation will be placed beside the mirrored backups and is named after the script's filename plus `.log` extension. By default, this is `/media/pve_backup_usb/dump/pve_backup_usb.sh.log`.
+
+If you are using the email notifications (cf. `-e`, `-f` and `-g` parameters), the complete logfile content will be added to the email message automatically.
+
+
+#### systemd journal
+
+The script logs with its own filename as `SYSLOG_IDENTIFIER`. So by default, you can filter with `pve_backup_usb.sh` as follows:
+
+```bash
+# all logs
+journalctl -t "pve_backup_usb.sh"
+
+# all logs, reverse order
+journalctl -t "pve_backup_usb.sh" -r
+
+# all logs, reverse order, without pager (so no scrolling, all written directly to STDOUT)
+journalctl -t "pve_backup_usb.sh" -r --no-pager
+
+# only errors
+journalctl -t "pve_backup_usb.sh" -r  -p 0..3
+
+# only non-error messages
+journalctl -t "pve_backup_usb.sh" -r  -p 4..7
+```
+
+Other examples:
+
+```bash
+# search for messages including related things (produced by other units, e.g. mount
+# messages, cronjob start, ...) in  reverse order
+journalctl -r -g "pve_backup_usb"
+
+# JSON, pretty print
+journalctl -o "json" --no-pager -t "pve_backup_usb.sh" -r | jq -C . | less
+journalctl -o "json" --no-pager -g "pve_backup_usb" -r | jq -C . | less
+```
+
 
 ## License, copyright
 
