@@ -16,6 +16,7 @@
 ## Table of Contents
 
 - [Installation](#installation)
+- [Updating](#updating)
 - [Usage](#usage)
   - [Parameters](#parameters)
   - [Cronjob example](#cronjob-example)
@@ -23,6 +24,8 @@
   - [Logging](#logging)
     - [Logfile](#logfile)
     - [systemd journal](#systemd-journal)
+- [Compatibility](#compatibility)
+- [Contributing](#contributing)
 - [License, copyright](#license-copyright)
 - [Author information](#author-information)
 
@@ -31,16 +34,16 @@
 
 Simply store [`pve_backup_usb.sh`](./pve_backup_usb.sh) where you like and make it executable. `/usr/local/bin/pve_backup_usb.sh` is usually a good place.
 
-You might download the latest release via command line as follows:
+You can download the latest release via command line as follows:
 
 ```bash
 
-# install dependencies (usually, all except of hdparm should be
-# already installed on a common PVE host)
-apt-get install coreutils hdparm lsof util-linux
+# install dependencies (all except of hdparm and jq should be already
+# installed on a common PVE host; jq is not needed by the script for
+# some of the code snippets of the README)
+apt-get install coreutils hdparm jq lsof util-linux
 
 # get latest version
-apt-get install jq
 version="$(curl -s -L https://api.github.com/repos/foundata/proxmox-pve_backup_usb/releases/latest | jq -r '.tag_name' | sed -e 's/^v//g')"
 printf '%s\n' "${version}"
 
@@ -54,6 +57,11 @@ cat "/usr/local/bin/pve_backup_usb.sh"
 chown "root:root" "/usr/local/bin/pve_backup_usb.sh"
 chmod 0755 "/usr/local/bin/pve_backup_usb.sh"
 ```
+
+
+## Updating
+
+Updating is as simple as overwriting the old script file. Just follow the [installation instructions](#installation) to get the newest release. This should be a low-risk operation as there were no backwards-compatibility-breaking releases yet (for example, all existing releases handle the target storage the same way).
 
 
 ## Usage
@@ -104,7 +112,7 @@ By default, the script is using the first partition on the first USB disk it det
 * `-h`: Flag to print help.
 * `-k`: Path to a keyfile containing a passphrase to unlock the target device. Defaults to `/etc/credentials/luks/pve_backup_usb`. There must be no other chars beside the passphrase, including no trailing new line or [`EOF`](https://en.wikipedia.org/wiki/End-of-file). You might use `perl -pi -e 'chomp if eof' /etc/credentials/luks/pve_backup_usb` to get rid of an invisible, unwanted `EOF`.
 * `-l`: Name used for handling LUKS via `/dev/mapper/` and creating a mountpoint subdirectory at `/media/`. Defaults to `pve_backup_usb`. 16 alphanumeric chars at max.
-* `-q`: Flag to enable quiet mode. Emails will be sent only on error then.
+* `-q`: Flag to enable quiet mode. Emails will be sent only on `error` or `warning` then (but not on `info` or `success`).
 * `-u`: Username of the account used to run the backups. Defaults to `root`. The script checks if the correct user is calling it and permissions of e.g. the keyfile are fitting or are too permissive. The user also needs permissions to mount devices. Running the script as `root`` is propably a good choice for most environments.
 
 
@@ -274,6 +282,21 @@ journalctl -r -g "pve_backup_usb"
 journalctl -o "json" --no-pager -t "pve_backup_usb.sh" -r | jq -C . | less
 journalctl -o "json" --no-pager -g "pve_backup_usb" -r | jq -C . | less
 ```
+
+
+## Compatibility
+
+The script should be compatible with Proxmox Virtual Environment (PVE) 7.X and newer. It was tested on:
+
+* Proxmox VE 8.0.4
+* Proxmox VE 7.4-16
+
+
+## Contributing
+
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md) if you want to get involved.
+
+The script's functionality is mature, so there might be little activity on the repository in the future. Don't get fooled by this, the project is under active maintenance and used on daily basis by the maintainers.
 
 
 ## License, copyright
