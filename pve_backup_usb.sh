@@ -188,7 +188,7 @@ USB drives, including proper logging and optional email notifications.
 .B [-q]
 
 .SH DESCRIPTION
-See https://github.com/foundata/proxmox-pve_backup_usb/blob/ for a detailled
+See https://github.com/foundata/proxmox-pve_backup_usb/ for a detailled
 description.
 
 .SH OPTIONS
@@ -646,29 +646,17 @@ function syncUmountAndClose() {
 trap 'syncUmountAndClose' EXIT SIGINT SIGTERM
 
 
-# securely create a temporary file
-tempfile=''
+# create a temporary file and use it as logfile
+logfile_path=''
 : "${TMPDIR:=/tmp}" # if env var ${TMPDIR} is empty, set its value to /tmp
-if command -v 'mktemp' > /dev/null 2>&1
+mask_save="$(umask)"; umask 077 # temporarily change mask
+logfile_path="$(mktemp "${TMPDIR}/$(basename "${0}")_XXXXXXXXXXXXXX")" || logfile_path='';
+umask "${mask_save}"; unset mask_save # restore mask
+if [ -z "${logfile_path}" ] || ! [ -f "${logfile_path}" ]
 then
-    mask_save="$(umask)"; umask 077 # temporarily change mask
-    tempfile="$(mktemp "${TMPDIR}/XXXXXXXXXXXXXX")" || tempfile='';
-    umask "${mask_save}"; unset mask_save # restore mask
-else
-    mask_save="$(umask)"; umask 077 # temporarily change mask
-    tempfile="${TMPDIR}/$(awk -v p="$$" 'BEGIN { srand(); s = rand(); sub(/^0./, "", s); printf("%X%X", p, s) }')"
-    touch "${tempfile}" > /dev/null 2>&1 || tempfile='';
-    umask "${mask_save}"; unset mask_save # restore mask
-fi
-if [ -z "${tempfile}" ] || ! [ -f "${tempfile}" ]
-then
-    endScript "Creation of temporary file failed:\n${tempfile}"
+    endScript "Creation of temporary file failed:\n${logfile_path}"
     exit 1 # endScript should exit, this is just a fallback
 fi
-
-
-# set new tempfile as logfile
-logfile_path="${tempfile}"
 
 
 # check if there is another instance of this script
@@ -687,7 +675,7 @@ fi
 
 
 # check if needed commands and tools are available
-for cmd in "cut" "cryptsetup" "date" "df" "du" "fold" "hostname" "hdparm" "logger" "lsblk" "lsof" "mail" "mountpoint" "numfmt" "rmdir" "stat" "sum"
+for cmd in "cut" "cryptsetup" "date" "df" "du" "fold" "hostname" "hdparm" "logger" "lsblk" "lsof" "mail" "mktemp" "mountpoint" "numfmt" "rmdir" "stat" "sum"
 do
     if ! command -v "${cmd}" > /dev/null 2>&1
     then

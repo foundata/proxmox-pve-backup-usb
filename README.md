@@ -230,9 +230,15 @@ cryptsetup luksClose "pve_backup_usb"
 
 #### Logfile
 
-The detailled logfile of a copy operation will be placed beside the mirrored backups and is named after the script's filename plus `.log` extension. By default, this is `/media/pve_backup_usb/dump/pve_backup_usb.sh.log`.
+The detailled logfile of a script run will be copied beside the mirrored backups and is named after the script's filename plus `.log` extension. By default, this is `/media/pve_backup_usb/dump/pve_backup_usb.sh.log`.
 
-If you are using the email notifications (cf. `-e`, `-f` and `-g` parameters), the complete logfile content will be added to the email message automatically.
+The logfile is handled as temporary file during the script execution and placed at `${TMPDIR}/pve_backup_usb_XXXXXXXXXXXXXX` where `XXXXXXXXXXXXXX` is random and `$TMPDIR` is either defined by your environment or set to `/tmp`. If you want to look at the file during execution without blocking the file, the following command can do so (the `:` at the beginning is no error):
+
+```bash
+: "${TMPDIR:=/tmp}"; cat "${TMPDIR}/pve_backup_usb_"* | less
+```
+
+If you are using email notifications (cf. `-e`, `-f` and `-g` parameters), the complete logfile content will be added to the email message automatically.
 
 
 #### systemd journal
