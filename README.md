@@ -17,7 +17,7 @@
 
 - [Installation](#installation)
 - [Usage](#usage)
-  - [Available parameters](#available-parameters)
+  - [Parameters](#parameters)
   - [Cronjob example](#cronjob-example)
   - [Preparation of an external USB drive](#preparation-of-an-external-usb-drive)
   - [Logging](#logging)
@@ -77,13 +77,12 @@ Explanation:
 * `-e`: email the backup report to `it@example.com`
 * `-g`: email the backup report (as CC) to `admin2@example.com` and `admin3@example.com`
 
-
 The script deletes the old backup content on the target device (after copying the new data if there is enough space to copy the new files and keep the old ones during copy operation or upfront if there is not enough space to keep both). To keep multiple revisions of the last `N` PVE dumps, you can use multiple external drives and rotate them as you wish (=disconnect old drive, change and connect new drive).
 
 By default, the script is using the first partition on the first USB disk it detects in `/dev/disk/by-path/`. No worries: existing drives not [prepared](#preparation-of-an-external-usb-drive) for usage won't be destroyed nor touched as the decryption will fail. However, this automatism presumes that only one USB disk is connected during the script run. Defining a UUID will work if there is more than one USB disk attached (cf. `-d` parameter).
 
 
-### Available parameters
+### Parameters
 
 **Mandatory:**
 

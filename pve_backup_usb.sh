@@ -257,7 +257,8 @@ for most environments.
 Print this help.
 .TP
 .B -q
-Flag to enable quiet mode. Emails will be sent only on error then.
+Flag to enable quiet mode. Emails will be sent only on "error" or "warning"
+then (but not on "info" or "success").
 
 
 .SH EXIT STATUS
@@ -384,8 +385,8 @@ fi
 #
 # @param string the message
 # @param string optional, type to handle the message / environment during
-#        exit ("error", "info", "success"). Unknown type will be handled as
-#        "info". Defaults to "info".
+#        exit ("error", "warning", "info", "success"). Unknown type will be
+#        handled as "info". Defaults to "info".
 # @return integer Zero if execution succeeds, non-zero in case of failure.
 endScript() {
     local message="${1}"
@@ -398,6 +399,7 @@ endScript() {
     fi
 
     if [ "${type}" != "error" ] &&
+       [ "${type}" != "warning" ] &&
        [ "${type}" != "info" ] &&
        [ "${type}" != "success" ]
     then
@@ -446,9 +448,9 @@ endScript() {
 #
 # @param string the message
 # @param string optional, type / priority to syslog entry to handle
-#        ("error" (maps to priority "err"), "info" (maps to priority "info")),
-#        "success" (maps to "info")). Unknown type will be handled as
-#        "info". Defaults to "info".
+#        ("error" (maps to priority "err"), "warning" (maps to "warning"),
+#        "info" (maps to "info")), "success" (maps to "info")).
+#        Unknown type will be handled as "info". Defaults to "info".
 # @return integer Zero if execution succeeds, non-zero in case of failure.
 syslog() {
     local message="${1}"
@@ -461,6 +463,7 @@ syslog() {
     fi
 
     if [ "${type}" != "error" ] &&
+       [ "${type}" != "warning" ] &&
        [ "${type}" != "info" ] &&
        [ "${type}" != "success" ]
     then
@@ -477,6 +480,9 @@ syslog() {
            [ "${type}" = "info" ]
         then
             logger_priority="info"
+        elif [ "${type}" = "warning" ]
+        then
+            logger_priority="warning"
         else
             logger_priority="err"
         fi
@@ -495,13 +501,14 @@ syslog() {
 
 
 ###
-# Small handler to print messages to STDOUT, STDERR and write them into the logfile
-# (created automatically when this script started, cf. $logfile_path) in parallel.
+# Small handler to print messages to STDOUT, STDERR and write them into the
+# logfile (created automatically when this script started, cf. $logfile_path)
+# in parallel.
 #
 # @param string the message to print and write to logfile.
-# @param string optional, type of the message ("error", "info", "success").
-#        Unknown type will be handled as "info". Defaults to "info". "error"
-#        will be written to STDERR, everything elso to STDOUT.
+# @param string optional, type of the message ("error", "warning", "info",
+#        "success"). Unknown type will be handled as "info". Defaults to
+#        "info". "error" will be written to STDERR, everything elso to STDOUT.
 # @return no return, exit will be called with exit code 1 if type or result
 #         was set to "error" and 0 when "success".
 message() {
@@ -515,6 +522,7 @@ message() {
     fi
 
     if [ "${type}" != "error" ] &&
+       [ "${type}" != "warning" ] &&
        [ "${type}" != "info" ] &&
        [ "${type}" != "success" ]
     then
@@ -545,8 +553,9 @@ message() {
 # Helper to send emails
 #
 # @param string the message
-# @param string type / priority to syslog entry to handle ("error", "info", "success").
-#        Unknown type will be handled as "info". Defaults to "info".
+# @param string type / priority to syslog entry to handle ("error", "warning",
+#        "info", "success"). Unknown type will be handled as "info". Defaults
+#        to "info".
 # @return integer Zero if execution succeeds, non-zero in case of failure.
 sendEmail() {
     local message="${1}"
@@ -559,6 +568,7 @@ sendEmail() {
     fi
 
     if [ "${type}" != "error" ] &&
+       [ "${type}" != "warning" ] &&
        [ "${type}" != "info" ] &&
        [ "${type}" != "success" ]
     then
@@ -568,6 +578,7 @@ sendEmail() {
 
     # email
     if [ "${type}" = "error" ] ||
+       [ "${type}" = "warning" ] ||
        [ "${opt_quiet}" != "1" ]
     then
         if ! command -v "mail" > /dev/null 2>&1
@@ -650,7 +661,7 @@ trap 'syncUmountAndClose' EXIT SIGINT SIGTERM
 logfile_path=''
 : "${TMPDIR:=/tmp}" # if env var ${TMPDIR} is empty, set its value to /tmp
 mask_save="$(umask)"; umask 077 # temporarily change mask
-logfile_path="$(mktemp "${TMPDIR}/$(basename "${0}")_XXXXXXXXXXXXXX")" || logfile_path='';
+logfile_path="$(mktemp "${TMPDIR}/pve_backup_usb_XXXXXXXXXXXXXX")" || logfile_path='';
 umask "${mask_save}"; unset mask_save # restore mask
 if [ -z "${logfile_path}" ] || ! [ -f "${logfile_path}" ]
 then
@@ -1004,7 +1015,7 @@ if [ ${#backup_sources_cp[@]} -eq 0 ]
 then
     message ""
     message "No backups found. Please check if the machine IDs (parameter '-b') and source directories (parameter '-s') are correct."
-    endScript "There were no backups to mirror to '${target_mountpoint_path}'." "error"
+    endScript "There were no backups to mirror to '${target_mountpoint_path}'." "warning"
     exit 0 # endScript should exit, this is just a fallback
 fi
 if ! mountpoint -q "${target_mountpoint_path}" > /dev/null 2>&1
