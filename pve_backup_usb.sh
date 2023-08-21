@@ -648,6 +648,22 @@ function syncUmountAndClose() {
 }
 
 
+###
+# Prints the elapsed time since script start in human readable format
+#
+# @return integer Zero if execution succeeds, non-zero in case of failure.
+function timeElapsed() {
+    local time_elapsed=""
+    if ! [ -z "${SECONDS:-}" ] # $SECONDS is a bash internal var
+    then
+        time_elapsed=$SECONDS
+        time_elapsed="$(printf '%02dh:%02dm:%02ds\n' $((time_elapsed/3600)) $((time_elapsed%3600/60)) $((time_elapsed%60)))"
+    fi
+    echo "${time_elapsed}"
+    return 0
+}
+
+
 
 ################################################################################
 # Process
@@ -735,6 +751,7 @@ unset path_pvedumps_source
 
 # take care about stale or previously interrupted execs
 message "#### $(basename "${0}") ####"
+message "Current time: $(date -u)."
 message "CSV list of 'PveMachineID[:MaxBackupCount]' entries (defines what to copy): '${opt_backupcfg_list}'"
 message "Sync, unmount and close of LUKS device (upfront safeguard against stale or previously interrupted execs)."
 syncUmountAndClose
@@ -785,15 +802,9 @@ then
 fi
 
 
-# inform about elapsed time
-time_elapsed=""
-if ! [ -z "${SECONDS:-}" ] # $SECONDS is a bash internal var
-then
-    time_elapsed=$SECONDS
-    time_elapsed="$(printf '%02dh:%02dm:%02ds\n' $((time_elapsed/3600)) $((time_elapsed%3600/60)) $((time_elapsed%60)))"
-fi
-message "Elapsed time: ${time_elapsed}."
-unset time_elapsed
+# inform about time
+message "Current time: $(date -u)."
+message "Elapsed time: $(timeElapsed)."
 
 
 # disk info (best effort)
@@ -999,15 +1010,9 @@ then
 fi
 
 
-# inform about elapsed time
-time_elapsed=""
-if ! [ -z "${SECONDS:-}" ] # $SECONDS is a bash internal var
-then
-    time_elapsed=$SECONDS
-    time_elapsed="$(printf '%02dh:%02dm:%02ds\n' $((time_elapsed/3600)) $((time_elapsed%3600/60)) $((time_elapsed%60)))"
-fi
-message "Elapsed time: ${time_elapsed}."
-unset time_elapsed
+# inform about time
+message "Current time: $(date -u)."
+message "Elapsed time: $(timeElapsed)."
 
 
 # handle the files
@@ -1060,15 +1065,9 @@ do
         fi
         unset exitcode_sha1sum
 
-        # inform about elapsed time
-        time_elapsed=""
-        if ! [ -z "${SECONDS:-}" ] # $SECONDS is a bash internal var
-        then
-            time_elapsed=$SECONDS
-            time_elapsed="$(printf '%02dh:%02dm:%02ds\n' $((time_elapsed/3600)) $((time_elapsed%3600/60)) $((time_elapsed%60)))"
-        fi
-        message "Elapsed time: ${time_elapsed}."
-        unset time_elapsed
+        # inform about time
+        message "Current time: $(date -u)."
+        message "Elapsed time: $(timeElapsed)."
     fi
 
     # copy
@@ -1092,15 +1091,9 @@ do
     IFS="${ifs_save}"; unset ifs_save # restore IFS
     unset line output_cp
 
-    # inform about elapsed time
-    time_elapsed=""
-    if ! [ -z "${SECONDS:-}" ] # $SECONDS is a bash internal var
-    then
-        time_elapsed=$SECONDS
-        time_elapsed="$(printf '%02dh:%02dm:%02ds\n' $((time_elapsed/3600)) $((time_elapsed%3600/60)) $((time_elapsed%60)))"
-    fi
-    message "Elapsed time: ${time_elapsed}."
-    unset time_elapsed
+    # inform about time
+    message "Current time: $(date -u)."
+    message "Elapsed time: $(timeElapsed)."
 
     # break on error
     if [ $exitcode_cp -ne 0 ]
@@ -1144,15 +1137,9 @@ do
         unset exitcode_sha1sum
         message "Verification was successful."
 
-        # inform about elapsed time
-        time_elapsed=""
-        if ! [ -z "${SECONDS:-}" ] # $SECONDS is a bash internal var
-        then
-            time_elapsed=$SECONDS
-            time_elapsed="$(printf '%02dh:%02dm:%02ds\n' $((time_elapsed/3600)) $((time_elapsed%3600/60)) $((time_elapsed%60)))"
-        fi
-        message "Elapsed time: ${time_elapsed}."
-        unset time_elapsed
+        # inform about time
+        message "Current time: $(date -u)."
+        message "Elapsed time: $(timeElapsed)."
     fi
 done
 message "All file operations were finished successfully."
@@ -1167,13 +1154,9 @@ then
 fi
 
 
-time_elapsed=""
-if ! [ -z "${SECONDS:-}" ] # $SECONDS is a bash internal var
-then
-    time_elapsed=$SECONDS
-    time_elapsed="$(printf '%02dh:%02dm:%02ds\n' $((time_elapsed/3600)) $((time_elapsed%3600/60)) $((time_elapsed%60)))"
-    time_elapsed=" Elapsed time: ${time_elapsed}."
-fi
+# inform about time
+message "Current time: $(date -u)."
+message "Elapsed time: $(timeElapsed)."
 
 
 endScript "Mirroring backups to '${target_mountpoint_path}' was successful.${time_elapsed}" "success"
