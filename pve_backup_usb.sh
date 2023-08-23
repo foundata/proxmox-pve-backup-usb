@@ -413,14 +413,13 @@ endScript() {
     # create syslog entry
     syslog "${message}" "${type}"
 
-    # copy logfile beside the other files and clean up afterwards
+    # copy logfile beside the other files
     if [ -f "${logfile_path}" ]
     then
         if [ -d "${target_mountpoint_path}/${target_subdir}" ]
         then
             cp -f "${logfile_path}" "${target_mountpoint_path}/${target_subdir}/$(basename "${0}").log" > /dev/null 2>&1
         fi
-        rm -f "${logfile_path}" > /dev/null 2>&1
     fi
 
     # clean up
@@ -434,6 +433,12 @@ endScript() {
     fi
     sendEmail "${mailmessage}" "${type}"
     unset mailmessage
+
+    # clean up logfile
+    if [ -f "${logfile_path}" ]
+    then
+        rm -f "${logfile_path}" > /dev/null 2>&1
+    fi
 
     if [ "${type}" = "error" ]
     then
@@ -634,7 +639,7 @@ function syncUmountAndClose() {
            [ -n "$(find "${target_mountpoint_path}" -maxdepth 0 -empty -exec echo {} is empty. \; 2>/dev/null)" ]
            rmdir "${target_mountpoint_path}" > /dev/null 2>&1
         then
-            message "Successfully deleted mounpoint '${target_mountpoint_path}'."
+            message "Successfully deleted mountpoint '${target_mountpoint_path}'."
         fi
     fi
 
@@ -659,7 +664,7 @@ function timeElapsed() {
         time_elapsed=$SECONDS
         time_elapsed="$(printf '%02dh:%02dm:%02ds\n' $((time_elapsed/3600)) $((time_elapsed%3600/60)) $((time_elapsed%60)))"
     fi
-    echo "${time_elapsed}"
+    printf "%s" "${time_elapsed}"
     return 0
 }
 
