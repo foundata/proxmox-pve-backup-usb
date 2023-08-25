@@ -77,13 +77,13 @@ pve_backup_usb.sh \
 Explanation:
 
 * `-b "10:1,22:4,333"`: Handling backups of
-  * machine with PVE ID `10`: Only the last backup (if there are more, they will be ignored)
-  * machine with PVE ID `22`: Only the last four backups (if there are more, they will be ignored)
-  * machine with PVE ID `333`: All existing backups
-* Search in `/mnt/backup1/dump` and `/mnt/backup2/dump` for backups
-* `-c`: Create a checksums file and verify the backup copies afterwards
-* `-e`: email the backup report to `it@example.com`
-* `-g`: email the backup report (as CC) to `admin2@example.com` and `admin3@example.com`
+  * machine with PVE ID `10`: only the last backup (`:1`) (if there are more, they will be ignored)
+  * machine with PVE ID `22`: only the last four backups (`:4`) (if there are more, they will be ignored)
+  * machine with PVE ID `333`: all existing backups (no `:X` behind the PVE ID)
+* `-s`: Search in `/mnt/backup1/dump` and `/mnt/backup2/dump` for PVE backup dumps to copy. Both paths have to exist. Separator for multiple sources is `:`.
+* `-c`: Create a checksums file and verify the backup copies afterwards.
+* `-e`: email the backup report to `it@example.com`.
+* `-g`: email the backup report (as CC) to `admin2@example.com` and `admin3@example.com`.
 
 The script deletes the old backup content on the target device (after copying the new data if there is enough space to copy the new files and keep the old ones during copy operation or upfront if there is not enough space to keep both). To keep multiple revisions of the last `N` PVE dumps, you can use multiple external drives and rotate them as you wish (=disconnect old drive, change and connect new drive).
 
