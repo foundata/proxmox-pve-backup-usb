@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nothing worth mentioning yet.
 
 
+## [1.1.2] - 2023-08-30
+
+### Fixed
+
+- Fix regression, preventing email notification on success (085047d)
+
+
 ## [1.1.1] - 2023-08-23
 
 ### Fixed
@@ -44,8 +51,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All functionality and files.
 
 
-[unreleased]: https://github.com/foundata/proxmox-pve_backup_usb/compare/v1.1.1...HEAD
-[1.1.1]: https://github.com/foundata/proxmox-pve_backup_usb/releases/tag/v1.1.0
+[unreleased]: https://github.com/foundata/proxmox-pve_backup_usb/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/foundata/proxmox-pve_backup_usb/releases/tag/v1.1.2
+[1.1.1]: https://github.com/foundata/proxmox-pve_backup_usb/releases/tag/v1.1.1
 [1.1.0]: https://github.com/foundata/proxmox-pve_backup_usb/releases/tag/v1.1.0
 [1.0.1]: https://github.com/foundata/proxmox-pve_backup_usb/releases/tag/v1.0.1
 [1.0.0]: https://github.com/foundata/proxmox-pve_backup_usb/releases/tag/v1.0.0
