@@ -24,6 +24,7 @@
   - [Logging](#logging)
     - [Logfile](#logfile)
     - [systemd journal](#systemd-journal)
+    - [Example logfile](#example-logfile)
 - [Compatibility](#compatibility)
 - [Contributing](#contributing)
 - [License, copyright](#license-copyright)
@@ -232,6 +233,7 @@ TARGETDEVICE="/dev/$(ls -l /dev/disk/by-path/*usb*part1 | cut -f 7 -d "/" | head
 cryptsetup open --key-file "/etc/credentials/luks/pve_backup_usb" "${TARGETDEVICE}" "pve_backup_usb"
 ls -l "/dev/mapper/pve_backup_usb"
 cryptsetup luksClose "pve_backup_usb"
+dmsetup ls --target "crypt"
 ```
 
 
@@ -281,6 +283,83 @@ journalctl -r -g "pve_backup_usb"
 # JSON, pretty print
 journalctl -o "json" --no-pager -t "pve_backup_usb.sh" -r | jq -C . | less
 journalctl -o "json" --no-pager -g "pve_backup_usb" -r | jq -C . | less
+```
+
+
+#### Example logfile
+
+Running the command
+
+```bash
+/usr/local/bin/pve_backup_usb.sh -c -b "120:1" -s "/mnt/localbackup01/pve/dump"`
+```
+
+to mirror the lastest dump of the VM with PVE ID `120` from `/mnt/localbackup01/pve/dump` to the encrypted USB device (a cheap 5TB WD Elements USB-HDD) gave the following logfile:
+
+```
+#### pve_backup_usb.sh ####
+Current time: Wed Aug 30 05:58:34 PM UTC 2023.
+CSV list of 'PveMachineID[:MaxBackupCount]' entries (defines what to copy): '120:1'
+Sync, unmount and close of LUKS device (upfront safeguard against stale or previously interrupted execs).
+Creating mountpoint at '/media/pve_backup_usb'
+Going to unlock '/dev/sdc1', using using keyfile '/etc/credentials/luks/pve_backup_usb'
+Successfully unlocked '/dev/sdc1', should be available at '/dev/mapper/pve_backup_usb' now.
+Current time: Wed Aug 30 05:58:37 PM UTC 2023.
+Elapsed time: 00h:00m:03s.
+
+#### Info about physical disk (mounted at /media/pve_backup_usb) ####
+Model Number:       WDC WD50NDZW-11MR8S1
+Serial Number:      WD-<censored>
+
+#### Checking for existing backups to copy for PVE ID 120 ####
+Found backup 'vzdump-qemu-120-2023_08_29-21_00_03' in '/mnt/localbackup01/pve/dump'
+Found backup 'vzdump-qemu-120-2023_08_28-21_00_02' in '/mnt/localbackup01/pve/dump'
+Found backup 'vzdump-qemu-120-2023_08_24-21_00_05' in '/mnt/localbackup01/pve/dump'
+Added backup 'vzdump-qemu-120-2023_08_29-21_00_03' to the list for processing.
+Skipped backup 'vzdump-qemu-120-2023_08_28-21_00_02' as max backup count 1 for ID '120' was reached.
+Skipped backup 'vzdump-qemu-120-2023_08_24-21_00_05' as max backup count 1 for ID '120' was reached.
+
+
+#### Miscellaneous preparation ####
+Copying the backup files will need 20.89GiB of space on the target device.
+The target device mounted at '/media/pve_backup_usb' has a size of about 4.27TiB.
+There seems to be older backup data on the target device, moving it from '/media/pve_backup_usb/dump' to '/media/pve_backup_usb/dump_old'
+Successfully moved '/media/pve_backup_usb/dump' to '/media/pve_backup_usb/dump_old'.
+There is about 4.27TiB of free space available on the target device.
+Current time: Wed Aug 30 05:58:37 PM UTC 2023.
+Elapsed time: 00h:00m:03s.
+Going to process the created list of backups to copy now.
+Creating copy target directory at '/media/pve_backup_usb/dump'.
+
+#### Handling backup 'vzdump-qemu-120-2023_08_29-21_00_03' ####
+Creating checksums file
+cd "/mnt/localbackup01/pve/dump" && sha1sum "./vzdump-qemu-120-2023_08_29-21_00_03"* > "/media/pve_backup_usb/dump/vzdump-qemu-120-2023_08_29-21_00_03.sha1" 2>&1
+Current time: Wed Aug 30 05:59:10 PM UTC 2023.
+Elapsed time: 00h:00m:36s.
+Starting copy of backup
+cp -r -f -v "/mnt/localbackup01/pve/dump/vzdump-qemu-120-2023_08_29-21_00_03"* "/media/pve_backup_usb/dump" 2>&1
+  '/mnt/localbackup01/pve/dump/vzdump-qemu-120-2023_08_29-21_00_03.log' -> '/media/pve_backup_usb/dump/vzdump-qemu-120-2023_08_29-21_00_03.log'
+  '/mnt/localbackup01/pve/dump/vzdump-qemu-120-2023_08_29-21_00_03.vma.zst' -> '/media/pve_backup_usb/dump/vzdump-qemu-120-2023_08_29-21_00_03.vma.zst'
+  '/mnt/localbackup01/pve/dump/vzdump-qemu-120-2023_08_29-21_00_03.vma.zst.notes' -> '/media/pve_backup_usb/dump/vzdump-qemu-120-2023_08_29-21_00_03.vma.zst.notes'
+Current time: Wed Aug 30 06:12:50 PM UTC 2023.
+Elapsed time: 00h:14m:16s.
+Verify checksums of file copies
+cd "/media/pve_backup_usb/dump" && sha1sum -c "./vzdump-qemu-120-2023_08_29-21_00_03.sha1" 2>&1
+  ./vzdump-qemu-120-2023_08_29-21_00_03.log: OK
+  ./vzdump-qemu-120-2023_08_29-21_00_03.vma.zst: OK
+  ./vzdump-qemu-120-2023_08_29-21_00_03.vma.zst.notes: OK
+Verification was successful.
+Current time: Wed Aug 30 06:13:19 PM UTC 2023.
+Elapsed time: 00h:14m:45s.
+All file operations were finished successfully.
+Going to clean up the old backup data at '/media/pve_backup_usb/dump_old'.
+Current time: Wed Aug 30 06:13:20 PM UTC 2023.
+Elapsed time: 00h:14m:46s.
+Mirroring backups to '/media/pve_backup_usb' was successful.
+Syslog entry was created (priority: info)
+Successfully unmounted '/media/pve_backup_usb'
+Successfully deleted mountpoint '/media/pve_backup_usb'.
+Successfully closed LUKS device 'pve_backup_usb'
 ```
 
 
