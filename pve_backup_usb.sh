@@ -1164,5 +1164,5 @@ message "Current time: $(date -u)."
 message "Elapsed time: $(timeElapsed)."
 
 
-endScript "Mirroring backups to '${target_mountpoint_path}' was successful.${time_elapsed}" "success"
+endScript "Mirroring backups to '${target_mountpoint_path}' was successful." "success"
 exit 0 # endScript should exit, this is just a fallback
