@@ -9,7 +9,7 @@
 * Easy selection of PVE dumps to copy (including limitation of „only the N newest ones of machine X“).
 * Can search multiple backup source directories for PVE dumps.
 * Automatic search of USB drive, mount including decryption / `cryptsetup open`.
-* Extensive output, syslog and optional mail notification (using the system's `mail`; please make sure a proper relay is configured).
+* Extensive output, syslog and optional mail notification (using the system's `mail`; please make sure a [proper mail relay is configured](https://foundata.com/en/blog/2023/proxmox-pve-email-relay-smart-host/)).
 * Robust error handling and checks (e.g. available space on target, prevent parallel execution and so on).
 
 
