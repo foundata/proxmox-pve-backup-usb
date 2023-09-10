@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nothing worth mentioning yet.
 
 
+## [1.1.3] - 2023-09-10
+
+### Fixed
+
+-  Fix error preventing copying even if there is enough space on the target in some situations (559eb10)
+
+### Changed
+
+-  Undo moving old dumps on target device if deleting them would not free up sufficient space. (c2a741f)
+
+
 ## [1.1.2] - 2023-08-30
 
 ### Fixed
@@ -51,7 +62,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All functionality and files.
 
 
-[unreleased]: https://github.com/foundata/proxmox-pve_backup_usb/compare/v1.1.2...HEAD
+[unreleased]: https://github.com/foundata/proxmox-pve_backup_usb/compare/v1.1.3...HEAD
+[1.1.3]: https://github.com/foundata/proxmox-pve_backup_usb/releases/tag/v1.1.3
 [1.1.2]: https://github.com/foundata/proxmox-pve_backup_usb/releases/tag/v1.1.2
 [1.1.1]: https://github.com/foundata/proxmox-pve_backup_usb/releases/tag/v1.1.1
 [1.1.0]: https://github.com/foundata/proxmox-pve_backup_usb/releases/tag/v1.1.0
