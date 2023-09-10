@@ -968,7 +968,7 @@ then
     then
         message "Successfully moved '${target_mountpoint_path}/${target_subdir}' to '${target_mountpoint_path}/${target_subdir_old}'."
     else
-        endScript "Could not move old backup data from '${target_mountpoint_path}/${target_subdir}' to "${target_subdir_old}/${target_subdir_old}")." "error"
+        endScript "Could not move old backup data from '${target_mountpoint_path}/${target_subdir}' to '${target_mountpoint_path}/${target_subdir_old}'." "error"
         exit 1 # endScript should exit, this is just a fallback
     fi
 fi
@@ -992,6 +992,13 @@ then
         message "The old backup data takes about ${bytes_oldcopy_human} of space."
         if [ $(($bytes_needed+0)) -gt $(($(($bytes_available+0))+$(($bytes_oldcopy+0)))) ]
         then
+            message "Moving back old backup data on the target device from '${target_mountpoint_path}/${target_subdir_old}' to '${target_mountpoint_path}/${target_subdir}' (deleting it would not free up sufficient space)."
+            if mv -f "${target_mountpoint_path}/${target_subdir_old}" "${target_mountpoint_path}/${target_subdir}" > /dev/null 2>&1
+            then
+                message "Successfully moved '${target_mountpoint_path}/${target_subdir_old}' to '${target_mountpoint_path}/${target_subdir}'."
+            else
+                message "Could not move back old backup data from '${target_mountpoint_path}/${target_subdir_old}' to '${target_mountpoint_path}/${target_subdir}'." "error"
+            fi
             endScript "Aborted. There is not enough space available on '${target_mountpoint_path}', even when the old backup data gets deleted (${bytes_afterdel_human} (estimate) available after delete, ${bytes_needed_human} needed)." "error"
             exit 1 # endScript should exit, this is just a fallback
         else
