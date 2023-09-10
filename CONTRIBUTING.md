@@ -4,7 +4,7 @@ Thank you for your interest in contributing. This file provides an overview of t
 
 * Use Issues if you want to report a problem or want to see a feature.
 * Create a pull requests (PR) to submit code.
-* Send an email to the maintainer if you have something to discuss (no support request).
+* Send an email to the maintainer if you have something to discuss (no support requests).
 
 
 ## Issues
@@ -16,7 +16,7 @@ As a general rule, we don't assign issues to anyone. If you find an issue to wor
 
 ## Discussions
 
-There is no public discussion or forum. If you have something to discuss or comment about the backup script, feel free to send an email to Andreas Haerter <ah@foundata.com> (no support requests, the script is provided „as is“ regarding usage).
+There is no public discussion or forum. If you have something to discuss or comment about the project, feel free to send an email to Andreas Haerter <ah@foundata.com> (no support requests, all ressources are provided „as is“).
 
 
 ## Pull Requests (PRs)
