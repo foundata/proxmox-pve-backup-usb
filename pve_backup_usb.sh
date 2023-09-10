@@ -942,7 +942,7 @@ message "Copying the backup files will need ${bytes_needed_human} of space on th
 
 
 # analyze target device
-bytes_target_size=$(($(df --output=avail -B 1 "${target_mountpoint_path}" | tail -n 1)+0))
+bytes_target_size=$(($(df --output=size -B 1 "${target_mountpoint_path}" | tail -n 1)+0))
 bytes_target_size=$((${bytes_target_size} - 1074000000)) # ~ roughly 1 GiB buffer
 bytes_target_size_human="$(numfmt --to=iec-i --suffix=B --format='%.2f' ${bytes_target_size})"
 message "The target device mounted at '${target_mountpoint_path}' has a size of about ${bytes_target_size_human}."
@@ -984,7 +984,7 @@ then
     # handle existing data on the target (if any)
     if [ -d "${target_mountpoint_path}/${target_subdir_old}" ]
     then
-        bytes_oldcopy=$(($(du -cs "${target_mountpoint_path}/${target_subdir_old}" | tail -n 1 | cut -f1)+0))
+        bytes_oldcopy=$(($(du --total --summarize --bytes "${target_mountpoint_path}/${target_subdir_old}" | tail -n 1 | cut -f1)+0))
         bytes_oldcopy=$((${bytes_oldcopy} + 1074000000)) # ~ roughly 1 GiB buffer
         bytes_oldcopy_human="$(numfmt --to=iec-i --suffix=B --format='%.2f' ${bytes_oldcopy})"
         bytes_afterdel=$(($(($bytes_available+0))+$(($bytes_oldcopy+0))))
@@ -1004,7 +1004,7 @@ then
         bytes_available=$(($(df --output=avail -B 1 "${target_mountpoint_path}" | tail -n 1)+0))
         bytes_available=$((${bytes_available} - 1074000000)) # ~ roughly 1 GiB buffer
         bytes_available_human="$(numfmt --to=iec-i --suffix=B --format='%.2f' ${bytes_available})"
-        message "There is about '${bytes_available_human}' of space available on the target device."
+        message "There is about ${bytes_available_human} of free space available on the target device."
     fi
 
     if [ $(($bytes_needed+0)) -gt  $(($bytes_available+0)) ]
