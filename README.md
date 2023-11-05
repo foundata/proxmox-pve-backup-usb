@@ -114,7 +114,7 @@ By default, the script is using the first partition on the first USB disk it det
 * `-k`: Path to a keyfile containing a passphrase to unlock the target device. Defaults to `/etc/credentials/luks/pve_backup_usb`. There must be no other chars beside the passphrase, including no trailing new line or [`EOF`](https://en.wikipedia.org/wiki/End-of-file). You might use `perl -pi -e 'chomp if eof' /etc/credentials/luks/pve_backup_usb` to get rid of an invisible, unwanted `EOF`.
 * `-l`: Name used for handling LUKS via `/dev/mapper/` and creating a mountpoint subdirectory at `/media/`. Defaults to `pve_backup_usb`. 16 alphanumeric chars at max.
 * `-q`: Flag to enable quiet mode. Emails will be sent only on `error` or `warning` then (but not on `info` or `success`).
-* `-u`: Username of the account used to run the backups. Defaults to `root`. The script checks if the correct user is calling it and permissions of e.g. the keyfile are fitting or are too permissive. The user also needs permissions to mount devices. Running the script as `root`` is propably a good choice for most environments.
+* `-u`: Username of the account used to run the backups. Defaults to `root`. The script checks if the correct user is calling it and permissions of e.g. the keyfile are fitting or are too permissive. The user also needs permissions to mount devices. Running the script as `root` is propably a good choice for most environments.
 
 
 ### Cronjob example
@@ -178,7 +178,7 @@ umount --force --recursive --all-targets "${TARGETDEVICE}"*
 #   dmsetup table ${deviceNameBelow/dev/mapper}
 #   cryptsetup luksDump ${device}
 # As of 2023 "aes-xts-plain64" should be a good choice.
-apt-get install parted
+apt-get install parted cryptsetup
 parted "${TARGETDEVICE}" mktable GPT
 parted "${TARGETDEVICE}" mkpart primary 0% 100%
 cryptsetup luksFormat --cipher aes-xts-plain64 --verify-passphrase "${TARGETDEVICE}1"
@@ -291,7 +291,7 @@ journalctl -o "json" --no-pager -g "pve_backup_usb" -r | jq -C . | less
 Running the command
 
 ```bash
-/usr/local/bin/pve_backup_usb.sh -c -b "120:1" -s "/mnt/localbackup01/pve/dump"`
+/usr/local/bin/pve_backup_usb.sh -c -b "120:1" -s "/mnt/localbackup01/pve/dump"
 ```
 
 to mirror the lastest dump of the VM with PVE ID `120` from `/mnt/localbackup01/pve/dump` to the encrypted USB device (a cheap 5TB WD Elements USB-HDD) gave the following logfile:
