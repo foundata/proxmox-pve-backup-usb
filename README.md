@@ -44,12 +44,12 @@ You can download the latest release via command line as follows:
 # some of the code snippets of the README)
 apt-get install coreutils hdparm jq lsof util-linux
 
-# get latest version
+# get version number of the latest release
 version="$(curl -s -L https://api.github.com/repos/foundata/proxmox-pve_backup_usb/releases/latest | jq -r '.tag_name' | sed -e 's/^v//g')"
 printf '%s\n' "${version}"
 
 # download
-curl -L "https://raw.githubusercontent.com/foundata/proxmox-pve_backup_usb/v${version}/pve_backup_usb.sh"  > "/usr/local/bin/pve_backup_usb.sh"
+curl -L "https://raw.githubusercontent.com/foundata/proxmox-pve_backup_usb/v${version}/pve_backup_usb.sh" > "/usr/local/bin/pve_backup_usb.sh"
 
 # check the content (you've just downloaded a file from the internet :-D)
 cat "/usr/local/bin/pve_backup_usb.sh"
@@ -231,7 +231,10 @@ perl -pi -e 'chomp if eof' /etc/credentials/luks/pve_backup_usb
 # test
 TARGETDEVICE="/dev/$(ls -l /dev/disk/by-path/*usb*part1 | cut -f 7 -d "/" | head -n 1)"
 cryptsetup open --key-file "/etc/credentials/luks/pve_backup_usb" "${TARGETDEVICE}" "pve_backup_usb"
+
+dmsetup ls --target "crypt"
 ls -l "/dev/mapper/pve_backup_usb"
+
 cryptsetup luksClose "pve_backup_usb"
 dmsetup ls --target "crypt"
 ```
@@ -378,9 +381,17 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) if you want to get involved.
 The script's functionality is mature, so there might be little activity on the repository in the future. Don't get fooled by this, the project is under active maintenance and used on daily basis by the maintainers.
 
 
-## License, copyright
+## Licensing, copyright
 
-This project is under [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0). See [`LICENSE`](./LICENSE) and [`NOTICE`](./NOTICE) for details.
+<!--REUSE-IgnoreStart-->
+Copyright (c) 2023, 2024 foundata GmbH (https://foundata.com)
+
+This project is licensed under the Apache License 2.0 (SPDX-License-Identifier: `Apache-2.0`), see [`LICENSES/Apache-2.0.txt`](LICENSES/Apache-2.0.txt) for the full text.
+
+The [`.reuse/dep5`](.reuse/dep5) file provides detailed licensing and copyright information in a human- and machine-readable format. This includes parts that may be subject to different licensing or usage terms, such as third party components. The repository conforms to the [REUSE specification](https://reuse.software/spec/), you can use [`reuse spdx`](https://reuse.readthedocs.io/en/latest/readme.html#cli) to create a [SPDX software bill of materials (SBOM)](https://en.wikipedia.org/wiki/Software_Package_Data_Exchange).
+<!--REUSE-IgnoreEnd-->
+
+[![REUSE status](https://api.reuse.software/badge/github.com/foundata/proxmox-pve_backup_usb)](https://api.reuse.software/info/github.com/foundata/proxmox-pve_backup_usb)
 
 
 ## Author information

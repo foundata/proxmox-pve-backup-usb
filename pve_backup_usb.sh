@@ -10,12 +10,8 @@
 # Further information:
 # https://github.com/foundata/proxmox-pve_backup_usb/blob/main/README.md
 #
-# License:
-# https://github.com/foundata/proxmox-pve_backup_usb/blob/main/LICENSE
-# https://github.com/foundata/proxmox-pve_backup_usb/blob/main/NOTICE
-#
-# Author(s):
-# Andreas Haerter <ah@foundata.com>
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: foundata GmbH <https://foundata.com>
 ################################################################################
 
 
