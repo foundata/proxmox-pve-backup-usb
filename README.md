@@ -27,7 +27,7 @@
     - [Example logfile](#example-logfile)
 - [Compatibility](#compatibility)
 - [Contributing](#contributing)
-- [License, copyright](#license-copyright)
+- [Licensing, copyright](#licensing-copyright)
 - [Author information](#author-information)
 
 
