@@ -863,7 +863,7 @@ do
     do
         last_found_backup_prefix=""
         ifs_save="${IFS}"; IFS="$(printf '\n+')"; IFS="${IFS%?}" # temporarily change IFS to "\n" (LF)
-        for resource in $(find "${path_pvedumps_source}" -iname "vzdump-*-${cfg_pve_id}-*" -type f | sort -r)
+        for resource in $(find "${path_pvedumps_source}" -not -iname "*\.log" -not -iname "*\.notes" -iname "vzdump-*-${cfg_pve_id}-*" -type f | sort -r)
         do
             resource_dir="$(dirname "${resource}"; printf '+')"; resource_dir="${resource_dir%??}"
             resource_filename="$(basename "${resource}"; printf '+')"; resource_filename="${resource_filename%??}"
