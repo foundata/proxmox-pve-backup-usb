@@ -855,7 +855,11 @@ do
     unset tuple
 
     # detect filename prefixes (to easily search fot all files belonging to a
-    # certain backup (dump, log, notes ...) of the defined VMs)
+    # certain backup (dump, log, notes ...) of the defined VMs). Example filenames
+    # of a backup (many parts are non-static, e.g. extension depend on backup type):
+    # - vzdump-qemu-120-2023_08_04-21_00_04.vma.zst
+    # - vzdump-qemu-120-2023_08_04-21_00_04.vma.zst.notes
+    # - vzdump-qemu-120-2023_08_09-21_00_05.log
     backuplist=() # init bash array to store these backup filename prefixes
     message ""
     message "#### Checking for existing backups to copy for PVE ID ${cfg_pve_id} ####"
@@ -867,11 +871,6 @@ do
         do
             resource_dir="$(dirname "${resource}"; printf '+')"; resource_dir="${resource_dir%??}"
             resource_filename="$(basename "${resource}"; printf '+')"; resource_filename="${resource_filename%??}"
-            # Example filenames of a backup (many parts are non-static, e.g.
-            # extension depend on backup type):
-            # - vzdump-qemu-120-2023_08_04-21_00_04.vma.zst
-            # - vzdump-qemu-120-2023_08_04-21_00_04.vma.zst.notes
-            # - vzdump-qemu-120-2023_08_09-21_00_05.log
             backup_date=$(printf "%s" "${resource_filename}" | awk -F- '{print $(NF-1)}')
             backup_time=$(printf "%s" "${resource_filename}" | awk -F- '{print $(NF)}' | awk -F. '{print $1}')
             backup_prefix=$(printf "%s" "${resource_filename}" | awk -F"${cfg_pve_id}-${backup_date}-${backup_time}" '{print $1}')
