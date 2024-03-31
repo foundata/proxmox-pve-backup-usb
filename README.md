@@ -1,6 +1,8 @@
 # `pve_backup_usb.sh` - Script to copy local PVE backup dumps to encrypted USB disks
 
-**This project is *not* associated with the official [Proxmox Virtual Environment (PVE)](https://www.proxmox.com/en/proxmox-virtual-environment/overview) nor Proxmox Server Solutions GmbH.**
+**This project is *not* associated with Proxmox Server Solutions GmbH nor the official [Proxmox Virtual Environment (PVE)](https://www.proxmox.com/en/proxmox-virtual-environment/overview) project.** Please [report any bugs or suggestions to us](./CONTRIBUTING.md), do NOT use the official Proxmox support channels.
+
+---
 
 `pve_backup_usb.sh` is a script for smaller environments without dedicated [Proxmox Backup Server](https://www.proxmox.com/en/proxmox-backup-server/overview). It helps you to copy PVE dumps (created by using the [built-in backup functionality](https://pve.proxmox.com/wiki/Backup_and_Restore) stored on a PVE Host) to external, encrypted USB drives for offsite disaster backup.
 
@@ -370,8 +372,8 @@ Successfully closed LUKS device 'pve_backup_usb'
 
 The script should be compatible with Proxmox Virtual Environment (PVE) 7.X and newer. It was tested on:
 
-* Proxmox VE 8.0.4
-* Proxmox VE 7.4-16
+* Proxmox VE 8: 8.1.4, 8.0.4
+* Proxmox VE 7: 7.4-16
 
 
 ## Contributing
