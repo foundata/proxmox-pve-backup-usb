@@ -9,7 +9,7 @@ Thank you for your interest in contributing. This file provides an overview of t
 
 ## Issues
 
-If you spot a problem, have an idea or a feature request, [search if an issue already exists](https://github.com/foundata/proxmox-pve_backup_usb/issues). If a related issue doesn't exist, you can simply open a new issue.
+If you spot a problem, have an idea or a feature request, [search if an issue already exists](https://github.com/foundata/proxmox-pve-backup-usb/issues). If a related issue doesn't exist, you can simply open a new issue.
 
 As a general rule, we don't assign issues to anyone. If you find an issue to work on, you are welcome to open a pull request (PR) with a fix or feature. So if there is an existing issue you are interested in, just work on it. You might leave a comment there to inform others that there is work going on.
 

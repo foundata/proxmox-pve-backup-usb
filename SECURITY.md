@@ -4,7 +4,7 @@
 
 Please use one of the following ways to report a security vulnerability or concern:
 
-* GitHub's private [security reporting feature](https://github.com/foundata/proxmox-pve_backup_usb/security/advisories/new).
+* GitHub's private [security reporting feature](https://github.com/foundata/proxmox-pve-backup-usb/security/advisories/new).
 * Write an email to `security@foundata.com`.
 
 Please make sure your report contains information about

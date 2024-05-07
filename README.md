@@ -47,11 +47,11 @@ You can download the latest release via command line as follows:
 apt-get install coreutils hdparm jq lsof util-linux
 
 # get version number of the latest release
-version="$(curl -s -L https://api.github.com/repos/foundata/proxmox-pve_backup_usb/releases/latest | jq -r '.tag_name' | sed -e 's/^v//g')"
+version="$(curl -s -L https://api.github.com/repos/foundata/proxmox-pve-backup-usb/releases/latest | jq -r '.tag_name' | sed -e 's/^v//g')"
 printf '%s\n' "${version}"
 
 # download
-curl -L "https://raw.githubusercontent.com/foundata/proxmox-pve_backup_usb/v${version}/pve_backup_usb.sh" > "/usr/local/bin/pve_backup_usb.sh"
+curl -L "https://raw.githubusercontent.com/foundata/proxmox-pve-backup-usb/v${version}/pve_backup_usb.sh" > "/usr/local/bin/pve_backup_usb.sh"
 
 # check the content (you've just downloaded a file from the internet :-D)
 cat "/usr/local/bin/pve_backup_usb.sh"
@@ -393,9 +393,9 @@ This project is licensed under the Apache License 2.0 (SPDX-License-Identifier: 
 The [`.reuse/dep5`](.reuse/dep5) file provides detailed licensing and copyright information in a human- and machine-readable format. This includes parts that may be subject to different licensing or usage terms, such as third party components. The repository conforms to the [REUSE specification](https://reuse.software/spec/), you can use [`reuse spdx`](https://reuse.readthedocs.io/en/latest/readme.html#cli) to create a [SPDX software bill of materials (SBOM)](https://en.wikipedia.org/wiki/Software_Package_Data_Exchange).
 <!--REUSE-IgnoreEnd-->
 
-[![REUSE status](https://api.reuse.software/badge/github.com/foundata/proxmox-pve_backup_usb)](https://api.reuse.software/info/github.com/foundata/proxmox-pve_backup_usb)
+[![REUSE status](https://api.reuse.software/badge/github.com/foundata/proxmox-pve-backup-usb)](https://api.reuse.software/info/github.com/foundata/proxmox-pve-backup-usb)
 
 
 ## Author information
 
-This project was created and is maintained by [foundata](https://foundata.com/). If you like it, you might [buy them a coffee](https://buy-me-a.coffee/proxmox-pve_backup_usb/).
+This project was created and is maintained by [foundata](https://foundata.com/). If you like it, you might [buy them a coffee](https://buy-me-a.coffee/proxmox-pve-backup-usb/).

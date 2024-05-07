@@ -30,13 +30,13 @@ Nothing special or automated yet. Therefore just some hints for manual testing:
    git tag -d v<version>                 # delete the old tag locally
    git push origin :refs/tags/v<version> # delete the old tag remotely
    ```
-   This is *only* possible if there was no [GitHub release](https://github.com/foundata/proxmox-pve_backup_usb/releases/). Use a new patch version number otherwise.
-5. Use [GitHub's release feature](https://github.com/foundata/proxmox-pve_backup_usb/releases/new), select the tag you pushed and create a new release:
+   This is *only* possible if there was no [GitHub release](https://github.com/foundata/proxmox-pve-backup-usb/releases/). Use a new patch version number otherwise.
+5. Use [GitHub's release feature](https://github.com/foundata/proxmox-pve-backup-usb/releases/new), select the tag you pushed and create a new release:
    * Use `v<version>` as title
    * A description is optional. In doubt, use `See CHANGELOG.md for more information about this release.`
 6. Check if the GitHub API delivers the correct version as `latest`:
    ```console
-   curl -s -L https://api.github.com/repos/foundata/proxmox-pve_backup_usb/releases/latest | jq -r '.tag_name' | sed -e 's/^v//g'
+   curl -s -L https://api.github.com/repos/foundata/proxmox-pve-backup-usb/releases/latest | jq -r '.tag_name' | sed -e 's/^v//g'
    ```
 
 

@@ -5,10 +5,10 @@
 # drives, including proper logging and optional email notifications.
 #
 # Repository:
-# https://github.com/foundata/proxmox-pve_backup_usb
+# https://github.com/foundata/proxmox-pve-backup-usb
 #
 # Further information:
-# https://github.com/foundata/proxmox-pve_backup_usb/blob/main/README.md
+# https://github.com/foundata/proxmox-pve-backup-usb/blob/main/README.md
 #
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: foundata GmbH <https://foundata.com>
@@ -184,7 +184,7 @@ USB drives, including proper logging and optional email notifications.
 .B [-q]
 
 .SH DESCRIPTION
-See https://github.com/foundata/proxmox-pve_backup_usb/ for a detailled
+See https://github.com/foundata/proxmox-pve-backup-usb/ for a detailled
 description.
 
 .SH OPTIONS
