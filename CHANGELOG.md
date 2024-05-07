@@ -17,11 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
--  Fix error preventing copying even if there is enough space on the target in some situations (559eb10)
+- Fix error preventing copying even if there is enough space on the target in some situations (559eb10)
 
 ### Changed
 
--  Undo moving old dumps on target device if deleting them would not free up sufficient space. (c2a741f)
+- Undo moving old dumps on target device if deleting them would not free up sufficient space. (c2a741f)
 
 
 ## [1.1.2] - 2023-08-30
