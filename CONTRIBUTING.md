@@ -21,11 +21,11 @@ There is no public discussion or forum. If you have something to discuss or comm
 
 ## Pull Requests (PRs)
 
-Make sure you read [`DEVELOPMENT.md`](./DEVELOPMENT.md), especially the [encoding section](./DEVELOPMENT.md#encoding). Make sure your PR:
+Make sure you read [`DEVELOPMENT.md`](./DEVELOPMENT.md), especially the [encoding section](./DEVELOPMENT.md#encoding). Make sure:
 
-1. is working / fix the problem / introduce a sane new feature.
-2. contains a proper commit message with a description of the change and reasoning.
-3. bonus: reference an issue (if any; PRs without an related issue are still welcome).
+1. That all source code or other components are compatible with the project's [licensing](./.reuse/dep5) and are traceable. Otherwise, we cannot accept your contribution.
+2. Your code is working / fix the problem / introduce a sane new feature.
+3. Your PR contains a proper commit message with a description of the change and reasoning.<br />Bonus: reference an issue (if any; PRs without an related issue are still welcome).
 
 If you do not know how to open a PR, there is plenty of useful information around on the web. Github is also providing quite good documentation:
 
