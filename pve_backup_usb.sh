@@ -209,8 +209,8 @@ By default, the script is simply using the first partition on the first USB
 disk it is able to find via /dev/disk/by-path/. No worries: existing drives
 not used for backups won't be destroyed as the decryption will fail. But this
 automatism presumes that only one USB disk is connected during the
-script run. Defining a UUID will work if there are more than one (e.g. when it
-is not feasible in your environment to just have one disk connected
+script run. Defining a UUID will work if there are multiple disks (e.g. when
+it is not feasible in your environment to just have one disk connected
 simultaneously).
 .TP
 .B -e
@@ -1041,7 +1041,7 @@ do
     if ! [ -d "${target_mountpoint_path}/${target_subdir}" ]
     then
         message "Creating copy target directory at '${target_mountpoint_path}/${target_subdir}'."
-        mkdir "${target_mountpoint_path}/${target_subdir}" # no "-p" as additional safeguard to prevent writing much data on the wrong partition: propably fails if mounting did not work a
+        mkdir "${target_mountpoint_path}/${target_subdir}" # no "-p" as additional safeguard to prevent writing much data on the wrong partition: propably fails if mounting did not work
     fi
 
     message ""
@@ -1067,7 +1067,10 @@ do
         # break on error
         if [ $exitcode_sha1sum -ne 0 ]
         then
-            endScript "Creating checksums file failed." "error"
+            # checksum errors are unusual, collect additional data about the target device for more useful sebugging information
+            bytes_available=$(($(df --output=avail -B 1 "${target_mountpoint_path}" | tail -n 1)+0))
+            bytes_available_human="$(numfmt --to=iec-i --suffix=B --format='%.2f' ${bytes_available})"
+            endScript "Creating checksums file failed with exit code $exitcode_sha1sum. Available space on target: ${bytes_available_human}" "error"
             exit 1 # endScript should exit, this is just a fallback
         fi
         unset exitcode_sha1sum
