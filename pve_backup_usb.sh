@@ -184,13 +184,13 @@ USB drives, including proper logging and optional email notifications.
 .B [-q]
 
 .SH DESCRIPTION
-See https://github.com/foundata/proxmox-pve-backup-usb/ for a detailled
+See https://github.com/foundata/proxmox-pve-backup-usb/ for a detailed
 description.
 
 .SH OPTIONS
 .TP
 .B -b
-Defines which PVE dumps of will be copied. The format is a CSV list of
+Defines which PVE dumps that will be copied. The format is a CSV list of
 "PveID:maxCount" value tuples where ":maxCount" is optional. All backups
 for "PveId" will be copied if ":maxCount" is not given. Example: The value
 "123:2,456:4,789" will copy
@@ -200,7 +200,7 @@ c) all backups of machine "789"
 .TP
 .B -c
 Enable checksum creation and verification of the copies (recommended for
-safety but propably doubles the time needed for completing the backup task).
+safety but probably doubles the time needed for completing the backup task).
 .TP
 .B -d
 A UUID of the target partition to decrypt. Will be used to search it in
@@ -246,7 +246,7 @@ slash, separated by ":"; Example: "/pve1/dumps:/pve2/dumps".
 Username of the account used to run the backups. Defaults to "root". This
 script checks if the correct user is calling it and permissions of e.g. the
 keyfile are fitting or are too permissive. The user also needs permissions
-to mount devices. Running the script as "root" is propably a good choice
+to mount devices. Running the script as "root" is probably a good choice
 for most environments.
 .TP
 .B -h
@@ -509,7 +509,7 @@ syslog() {
 # @param string the message to print and write to logfile.
 # @param string optional, type of the message ("error", "warning", "info",
 #        "success"). Unknown type will be handled as "info". Defaults to
-#        "info". "error" will be written to STDERR, everything elso to STDOUT.
+#        "info". "error" will be written to STDERR, everything else to STDOUT.
 # @return no return, exit will be called with exit code 1 if type or result
 #         was set to "error" and 0 when "success".
 message() {
@@ -1040,7 +1040,7 @@ do
     if ! [ -d "${target_mountpoint_path}/${target_subdir}" ]
     then
         message "Creating copy target directory at '${target_mountpoint_path}/${target_subdir}'."
-        mkdir "${target_mountpoint_path}/${target_subdir}" # no "-p" as additional safeguard to prevent writing much data on the wrong partition: propably fails if mounting did not work
+        mkdir "${target_mountpoint_path}/${target_subdir}" # no "-p" as additional safeguard to prevent writing much data on the wrong partition: probably fails if mounting did not work
     fi
 
     message ""
@@ -1144,7 +1144,7 @@ do
             message="Checksum verification failed. Available space on target: ${bytes_available_human}"
             if [ -n "${target_devicename}" ]
             then
-                message="${message}\nLast ten kernel errors relating to '${target_devicename}' (if any):\n$(dmesg -T -P -f 'kern' -l 'err,crit,alert,emerg' | grep "${target_devicename}" | tail -10 2>/dev/null)"
+                message="${message}\nLast ten kernel errors related to '${target_devicename}' (if any):\n$(dmesg -T -P -f 'kern' -l 'err,crit,alert,emerg' | grep "${target_devicename}" | tail -10 2>/dev/null)"
             fi
             endScript "${message}" "error"
             exit 1 # endScript should exit, this is just a fallback
