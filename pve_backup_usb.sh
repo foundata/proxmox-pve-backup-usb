@@ -809,10 +809,10 @@ message "Elapsed time: $(timeElapsed)."
 
 
 # disk info (best effort)
-device_name="$(lsblk -l -i -s "/dev/mapper/${target_mappername}" | tail -1 | cut -f1 -d' ' 2>/dev/null)"
-if [ -n "${device_name}" ]
+target_devicename="$(lsblk -l -i -s "/dev/mapper/${target_mappername}" | tail -1 | cut -f1 -d' ' 2>/dev/null)"
+if [ -n "${target_devicename}" ]
 then
-    output_hdparm="$(hdparm -I "/dev/${device_name}" 2>/dev/null)"
+    output_hdparm="$(hdparm -I "/dev/${target_devicename}" 2>/dev/null)"
     exitcode_hdparm=$?
     if [ $exitcode_hdparm -eq 0 ] &&
        [ -n "${output_hdparm}" ]
@@ -833,7 +833,7 @@ then
     fi
     unset exitcode_hdparm output_hdparm
 fi
-unset device_name
+readonly target_devicename
 
 
 # init bash array to store backup sources for the cp and find commands
