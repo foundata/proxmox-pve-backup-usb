@@ -809,7 +809,7 @@ message "Elapsed time: $(timeElapsed)."
 
 
 # disk info (best effort)
-target_devicename="$(lsblk -l -i -s "/dev/mapper/${target_mappername}" | tail -1 | cut -f1 -d' ' 2>/dev/null)"
+readonly target_devicename="$(lsblk -l -i -s "/dev/mapper/${target_mappername}" | tail -1 | cut -f1 -d' ' 2>/dev/null)"
 if [ -n "${target_devicename}" ]
 then
     output_hdparm="$(hdparm -I "/dev/${target_devicename}" 2>/dev/null)"
@@ -833,7 +833,6 @@ then
     fi
     unset exitcode_hdparm output_hdparm
 fi
-readonly target_devicename
 
 
 # init bash array to store backup sources for the cp and find commands
@@ -1067,10 +1066,7 @@ do
         # break on error
         if [ $exitcode_sha1sum -ne 0 ]
         then
-            # checksum errors are unusual, collect additional data about the target device for more useful sebugging information
-            bytes_available=$(($(df --output=avail -B 1 "${target_mountpoint_path}" | tail -n 1)+0))
-            bytes_available_human="$(numfmt --to=iec-i --suffix=B --format='%.2f' ${bytes_available})"
-            endScript "Creating checksums file failed with exit code $exitcode_sha1sum. Available space on target: ${bytes_available_human}" "error"
+            endScript "Creating checksums file failed with exit code $exitcode_sha1sum." "error"
             exit 1 # endScript should exit, this is just a fallback
         fi
         unset exitcode_sha1sum
@@ -1141,7 +1137,16 @@ do
         # break on error
         if [ $exitcode_sha1sum -ne 0 ]
         then
-            endScript "Checksum verification failed." "error"
+            # checksum verification errors are unusual, collect additional data about the target
+            # device for more useful debugging information
+            bytes_available=$(($(df --output=avail -B 1 "${target_mountpoint_path}" | tail -n 1)+0))
+            bytes_available_human="$(numfmt --to=iec-i --suffix=B --format='%.2f' ${bytes_available})"
+            message="Checksum verification failed. Available space on target: ${bytes_available_human}"
+            if [ -n "${target_devicename}" ]
+            then
+                message="${message}\nLast ten kernel errors relating to '${target_devicename}' (if any):\n$(dmesg -T -P -f 'kern' -l 'err,crit,alert,emerg' | grep "${target_devicename}" | tail -10 2>/dev/null)"
+            fi
+            endScript "${message}" "error"
             exit 1 # endScript should exit, this is just a fallback
         fi
         unset exitcode_sha1sum
