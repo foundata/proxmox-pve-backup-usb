@@ -4,14 +4,14 @@
 
 ---
 
-`pve_backup_usb.sh` is a script for smaller environments without dedicated [Proxmox Backup Server](https://www.proxmox.com/en/proxmox-backup-server/overview). It helps you to copy PVE dumps (created by using the [built-in backup functionality](https://pve.proxmox.com/wiki/Backup_and_Restore) stored on a PVE Host) to external, encrypted USB drives for offsite disaster backup.
+`pve_backup_usb.sh` is a script for smaller environments without dedicated [Proxmox Backup Server](https://www.proxmox.com/en/proxmox-backup-server/overview). It helps you to copy PVE dumps (created using the [built-in backup functionality](https://pve.proxmox.com/wiki/Backup_and_Restore) stored on a PVE Host) to external, encrypted USB drives for offsite disaster backups.
 
 **Features:**
 
-* Easy selection of PVE dumps to copy (including limitation of „only the N newest ones of machine X“).
+* Easy selection of PVE dumps to copy (including the limitation of „only the N newest ones of machine X“).
 * Can search multiple backup source directories for PVE dumps.
-* Automatic search of USB drive, mount including decryption / `cryptsetup open`.
-* Extensive output, syslog and optional mail notification (using the system's `mail`; please make sure a [proper mail relay is configured](https://foundata.com/en/blog/2023/proxmox-pve-email-relay-smart-host/)).
+* Automatic search of USB drive, mount including decryption/`cryptsetup open`.
+* Extensive output, syslog, and optional mail notification (using the system's `mail`; please make sure a [proper mail relay is configured](https://foundata.com/en/blog/2023/proxmox-pve-email-relay-smart-host/)).
 * Robust error handling and checks (e.g. available space on target, prevent parallel execution and so on).
 
 
@@ -64,7 +64,7 @@ chmod 0755 "/usr/local/bin/pve_backup_usb.sh"
 
 ## Updating
 
-Updating is as simple as overwriting the old script file. Just follow the [installation instructions](#installation) to get the newest release. This should be a low-risk operation as there were no backwards-compatibility-breaking releases yet (for example, all existing releases handle the target storage the same way).
+Updating is as simple as overwriting the old script file. Just follow the [installation instructions](#installation) to get the latest release. This should be a low-risk operation as there were no backwards-compatibility-breaking releases yet (for example, all existing releases handle the target storage the same way).
 
 
 ## Usage
@@ -88,18 +88,18 @@ Explanation:
 * `-e`: email the backup report to `it@example.com`.
 * `-g`: email the backup report (as CC) to `admin2@example.com` and `admin3@example.com`.
 
-The script deletes the old backup content on the target device (after copying the new data if there is enough space to copy the new files and keep the old ones during copy operation or upfront if there is not enough space to keep both). To keep multiple revisions of the last `N` PVE dumps, you can use multiple external drives and rotate them as you wish (=disconnect old drive, change and connect new drive).
+The script deletes the old backup content on the target device (after copying the new data if there is enough space to copy the new files and keep the old ones during copy operation or upfront if there is not enough space to keep both). To keep multiple revisions of the last `N` PVE dumps, you can use multiple external drives and rotate them as you wish (=disconnect the old drive, change and connect the new drive).
 
-By default, the script is using the first partition on the first USB disk it detects in `/dev/disk/by-path/`. No worries: existing drives not [prepared](#preparation-of-an-external-usb-drive) for usage won't be destroyed nor touched as the decryption will fail. However, this automatism presumes that only one USB disk is connected during the script run. Defining a UUID will work if there is more than one USB disk attached (cf. `-d` parameter).
+By default, the script uses the first partition on the first USB disk it detects in `/dev/disk/by-path/`. No worries: existing drives not [prepared](#preparation-of-an-external-usb-drive) for usage won't be destroyed nor touched as the decryption will fail. However, this automatism presumes that only one USB disk is connected during the script run. Defining a UUID will work if there are more than one USB disk attached (cf. `-d` parameter).
 
 
 ### Parameters
 
 **Mandatory:**
 
-* `-b`: Defines which PVE dumps of will be copied. The format is a CSV list of `PveID:maxCount` value tuples where `:maxCount` is optional. All backups for `PveId` will be copied if `:maxCount` is not given. Example: The value `123:2,456:4,789` will copy
+* `-b`: Defines which PVE dumps will be copied. The format is a CSV list of `PveID:maxCount` value tuples where `:maxCount` is optional. All backups for `PveId` will be copied if `:maxCount` is not given. Example: The value `123:2,456:4,789` will copy
   * the last two backups of machine `123`
-  * the last four backups machine `456`
+  * the last four backups of machine `456`
   * all backups of machine `789`
 * `-s`: List of one or more directories to search for PVE dumps, without trailing slash, separated by `:`. Examples: `/path/to/pve/dumps` or `/pve1/dumps:/pve2/dumps`.
 
@@ -121,7 +121,7 @@ By default, the script is using the first partition on the first USB disk it det
 
 ### Cronjob example
 
-The easiest way for getting a rotation in place and use this script is a cronjob. For example, place something like the following via `crontab -e` in the crontab of `root`:
+The easiest way to get a rotation in place and use this script is a cronjob. For example, place something like the following via `crontab -e` in the crontab of `root`:
 
 ```
 0 19 * * Sat  /usr/local/bin/pve_backup_usb.sh -b "10:1,22:4,333" -s "/mnt/backup1/dump:/mnt/backup2/dump" -c -e "it@example.com" -g "admin2@example.com,admin3@example.com" > /dev/null 2>&1
@@ -134,10 +134,10 @@ Explanation:
   * machine with PVE ID `10`: Only the last backup (if there are more, they will be ignored)
   * machine with PVE ID `22`: Only the last four backups (if there are more, they will be ignored)
   * machine with PVE ID `333`: All existing backups
-* Search in `/mnt/backup1/dump` and `/mnt/backup2/dump` for backups
-* `-c`: Create a checksums file and verifies the backup copies afterwards
-* `-e`: email the backup report to `it@example.com`
-* `-g`: email the backup report (as CC) to `admin2@example.com` and `admin3@example.com`
+* Search in `/mnt/backup1/dump` and `/mnt/backup2/dump` for backups.
+* `-c`: Create a checksums file and verifies the backup copies afterwards.
+* `-e`: Email the backup report to `it@example.com`.
+* `-g`: Email the backup report (as CC) to `admin2@example.com` and `admin3@example.com`.
 
 
 ### Preparation of an external USB drive
@@ -171,12 +171,12 @@ umount --force --recursive --all-targets "${TARGETDEVICE}"*
 
 # Create a partition and encrypt it.
 #
-# Please use a long passphrase (at least 20 chars) for security and store
-# it in your password management. You do not have to type it anywhere,
+# Please use a long passphrase (at least 20 characters) for security and
+# store it in your password management. You do not have to type it anywhere,
 # the script will grab it from a keyfile later.
 #
-# You might want to look at a current system with disk encryption which crypto
-# default settings are en-vouge:
+# You might want to look at a current system with disk encryption which
+# crypto default settings are en-vouge:
 #   dmsetup table ${deviceNameBelow/dev/mapper}
 #   cryptsetup luksDump ${device}
 # As of 2023 "aes-xts-plain64" should be a good choice.
@@ -265,10 +265,10 @@ The script logs with its own filename as `SYSLOG_IDENTIFIER`. So by default, you
 # all logs
 journalctl -t "pve_backup_usb.sh"
 
-# all logs, reverse order
+# all logs, in reverse order
 journalctl -t "pve_backup_usb.sh" -r
 
-# all logs, reverse order, without pager (so no scrolling, all written directly to STDOUT)
+# all logs, in reverse order, without pager (so no scrolling, all written directly to STDOUT)
 journalctl -t "pve_backup_usb.sh" -r --no-pager
 
 # only errors
@@ -281,7 +281,7 @@ journalctl -t "pve_backup_usb.sh" -r  -p 4..7
 Other examples:
 
 ```bash
-# search for messages including related things (produced by other units, e.g. mount
+# search for messages including related items (produced by other units, e.g. mount
 # messages, cronjob start, ...) in  reverse order
 journalctl -r -g "pve_backup_usb"
 
@@ -380,7 +380,7 @@ The script should be compatible with Proxmox Virtual Environment (PVE) 7.X and n
 
 See [`CONTRIBUTING.md`](./CONTRIBUTING.md) if you want to get involved.
 
-The script's functionality is mature, so there might be little activity on the repository in the future. Don't get fooled by this, the project is under active maintenance and used on daily basis by the maintainers.
+The script's functionality is mature, so there might be little activity on the repository in the future. Don't get fooled by this, the project is under active maintenance and used daily by the maintainers.
 
 
 ## Licensing, copyright
