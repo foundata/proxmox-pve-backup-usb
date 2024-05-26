@@ -1144,7 +1144,8 @@ do
             message="Checksum verification failed. Available space on target: ${bytes_available_human}"
             if [ -n "${target_devicename}" ]
             then
-                message="${message}\nLast ten kernel errors related to '${target_devicename}' (if any):\n$(dmesg -T -P -f 'kern' -l 'err,crit,alert,emerg' | grep "${target_devicename}" | tail -10 2>/dev/null)"
+                dmesg_target_device="$(dmesg -T -P -f 'kern' -l 'err,crit,alert,emerg' | grep "${target_devicename}" | tail -10)"
+                message="$(printf '%s\nLast ten kernel messages (err,crit,alert,emerg) related to %s (if any):\n%s\n' "${message}" "${target_devicename}" "${dmesg_target_device}")"
             fi
             endScript "${message}" "error"
             exit 1 # endScript should exit, this is just a fallback
