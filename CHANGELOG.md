@@ -10,9 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support for the [REUSE specification](https://reuse.software/spec/). The [`.reuse/dep5`](.reuse/dep5) file provides detailed licensing and copyright information in a human- and machine-readable format.
+- New option (`-j`) to allow the backup process to proceed with remaining files even if errors occur during copying or verification. (1a3584d)
 
-- New option (-j) to allows the backup process to proceed with remaining files even if errors occur during copying or verification. (1a3584d)
+- Support for the [REUSE specification](https://reuse.software/spec/). The [`.reuse/dep5`](.reuse/dep5) file provides detailed licensing and copyright information in a human- and machine-readable format.
 
 ### Changed
 
