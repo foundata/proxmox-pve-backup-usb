@@ -55,7 +55,7 @@ do
             if ! printf '%s' "${opt_backupcfg_list}" | grep -E -q -e "^[0-9][0-9:,]*$"
             then
                 opt_backupcfg_list=''
-                printf '%s: invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
+                printf '%s: Invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
                 exit 2
             fi
             ;;
@@ -71,7 +71,7 @@ do
             if ! printf '%s' "${opt_luks_target_uuid}" | grep -E -q -e "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
             then
                 opt_email_to=''
-                printf '%s: invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
+                printf '%s: Invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
                 exit 2
             fi
             ;;
@@ -82,7 +82,7 @@ do
             if ! printf '%s' "${opt_email_to}" | grep -E -q -e "^.+@.+$"
             then
                 opt_email_to=''
-                printf '%s: invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
+                printf '%s: Invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
                 exit 2
             fi
             ;;
@@ -93,7 +93,7 @@ do
             if ! printf '%s' "${opt_email_from}" | grep -E -q -e "^.+@.+$"
             then
                 opt_email_from=''
-                printf '%s: invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
+                printf '%s: Invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
                 exit 2
             fi
             ;;
@@ -104,7 +104,7 @@ do
             if ! printf '%s' "${opt_email_cc}" | grep -E -q -e "^.+@.+$" # works for CSV, too
             then
                 opt_email_cc=''
-                printf '%s: invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
+                printf '%s: Invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
                 exit 2
             fi
             ;;
@@ -115,7 +115,7 @@ do
             if [ -z "${opt_cryptsetup_keyfile_path}" ]
             then
                 opt_cryptsetup_keyfile_path=''
-                printf '%s: invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
+                printf '%s: Invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
                 exit 2
             fi
             ;;
@@ -127,7 +127,7 @@ do
                ! printf '%s' "${opt_target_mappername}" | grep -E -q -e "^[[:alnum:]_\-]{1,16}$"
             then
                 opt_target_mappername=''
-                printf '%s: invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
+                printf '%s: Invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
                 exit 2
             fi
             ;;
@@ -138,7 +138,7 @@ do
             if [ -z "${opt_source_paths_pvedumps_list}" ]
             then
                 opt_source_paths_pvedumps_list=''
-                printf '%s: invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
+                printf '%s: Invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
                 exit 2
             fi
             ;;
@@ -149,7 +149,7 @@ do
             if [ -z "${opt_backup_user}" ]
             then
                 opt_backup_user=''
-                printf '%s: invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
+                printf '%s: Invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
                 exit 2
             fi
             ;;
@@ -494,7 +494,7 @@ syslog() {
             message "'logger' exited with code "${exitcode_logger}"" "error"
             return 1
         else
-            message "Syslog entry was created (priority: "${logger_priority}")"
+            message "Syslog entry was created (priority: "${logger_priority}")."
         fi
     fi
     return 0
@@ -754,7 +754,7 @@ unset path_pvedumps_source
 message "#### $(basename "${0}") ####"
 message "Current time: $(date -u)."
 message "CSV list of 'PveMachineID[:MaxBackupCount]' entries (defines what to copy): '${opt_backupcfg_list}'"
-message "Sync, unmount and close of LUKS device (upfront safeguard against stale or previously interrupted execs)."
+message "Sync, unmount, and close of LUKS device (upfront safeguard against stale or previously interrupted execs)."
 syncUmountAndClose
 
 
@@ -955,7 +955,7 @@ then
     if [ -d "${target_mountpoint_path}/${target_subdir_old}" ]
     then
         # fallback if last clean-up operation was not successful
-        message "There is already old backup data at '${target_mountpoint_path}/${target_subdir_old}', going to delete it..."
+        message "Old backup data exists at '${target_mountpoint_path}/${target_subdir_old}', going to delete it..."
         rm -rf "${target_mountpoint_path}/${target_subdir_old}" > /dev/null 2>&1
     fi
     if mv -f "${target_mountpoint_path}/${target_subdir}" "${target_mountpoint_path}/${target_subdir_old}" > /dev/null 2>&1
@@ -1137,7 +1137,7 @@ do
         # break on error
         if [ $exitcode_sha1sum -ne 0 ]
         then
-            # checksum verification errors are unusual, collect additional data about the target
+            # checksum verification errors are unusual. Collect additional data about the target
             # device for more useful debugging information
             bytes_available=$(($(df --output=avail -B 1 "${target_mountpoint_path}" | tail -n 1)+0))
             bytes_available_human="$(numfmt --to=iec-i --suffix=B --format='%.2f' ${bytes_available})"

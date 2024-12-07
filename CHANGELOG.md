@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - ⚠️ Changed repository URL from `https://github.com/foundata/proxmox-pve_backup_usb` to `https://github.com/foundata/proxmox-pve-backup-usb` according to [our guidelines](https://github.com/foundata/guidelines/blob/master/git-repository-naming.md). GitHub [redirects HTTP and most of the `git` actions](https://docs.github.com/en/repositories/creating-and-managing-repositories/renaming-a-repository) but executing `git remote set-url origin git@github.com:foundata/proxmox-pve-backup-usb.git` is recommended.
 
+- Better error messages (dmesg), e.g. provide useful information in the script's log about hardware failures (94b68df)
+
 
 ## [1.1.3] - 2023-09-10
 
