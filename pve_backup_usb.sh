@@ -37,6 +37,7 @@ opt_luks_target_uuid='' # -d
 opt_email_to='' # -e
 opt_email_from='' # -f
 opt_email_cc='' # -g
+opt_continue_on_backuperror='0' # -j
 opt_cryptsetup_keyfile_path='' # -k
 opt_target_mappername='' # -l
 opt_quiet='0' # -q
@@ -46,7 +47,7 @@ opt_backup_user='' # -u
 # parse options
 opt=''
 OPTIND='1'
-while getopts ':qb:cd:e:f:g:l:s:u:h' opt
+while getopts ':qb:cd:e:f:g:hjl:s:u:' opt
 do
     case "${opt}" in
         # backup config
@@ -107,6 +108,11 @@ do
                 printf '%s: Invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
                 exit 2
             fi
+            ;;
+
+        # "Continue on backup error" flag
+        'j')
+            opt_continue_on_backuperror='1'
             ;;
 
         # key file
@@ -177,6 +183,7 @@ USB drives, including proper logging and optional email notifications.
 .BI "[-e " "email@example.com" "]"
 .BI "[-f " "email@example.org" "]"
 .BI "[-g " "email@example.com[,email@example.net[,...]]" "]"
+.B [-j]
 .BI "[-k " "/path/to/keyfile" "]"
 .BI "[-l " "mapper and mount point name" "]"
 .BI "[-s " "/pve1/dumps[:/pve2/dumps:...]" "]"
@@ -225,6 +232,18 @@ Has to be set for sending mails. Defaults to "do-not-reply@$(hostname -d)".
 .B -g
 Email address(es) to send notifications to (CC). Format: 'email@example.com'.
 Separate multiple addresses via comma (CSV list).
+.TP
+.B -j
+Flag to enable the continuation of the backup process in case of an error
+during the copying and/or verification of files. If this flag is not set, the
+script will immediately halt the entire backup process and display an error
+if any file to be backed up cannot be copied (or verified, cf. -c).
+If the flag is set, the backup will continue with the remaining files to be
+backed up (if any). Activating this feature requires careful review of the
+backup logs and emails/messages, as a quick inspection of the backup media
+might incorrectly suggest that all PVE sources were successfully backed up,
+even though some files may be missing or damaged. However, this allows for the
+possibility that at least some partially useful backup data will be available.
 .TP
 .B -k
 Path to a keyfile containing a passphrase to unlock the target device. Defaults
@@ -282,7 +301,7 @@ DELIM
 
         # unknown/not supported -> kill script and inform user
         *)
-            printf '%s: unknown option "-%c". Use "-h" to get usage instructions.\n' "$(basename "${0}")" "${OPTARG}" 1>&2
+            printf '%s: unknown option "-%c" (or missing option value). Use "-h" to get usage instructions.\n' "$(basename "${0}")" "${OPTARG}" 1>&2
             exit 2
             ;;
     esac
@@ -777,7 +796,7 @@ then
 fi
 
 
-# unlock target device
+# determine target device
 luks_target=""
 if [ -n "${luks_target_uuid}" ]
 then
@@ -785,6 +804,9 @@ then
 else
     luks_target="/dev/$(ls -l /dev/disk/by-path/*usb*part1 | cut -f 7 -d "/" | head -n 1)"
 fi
+
+
+# unlock target device
 message "Going to unlock '${luks_target}', using using keyfile '${cryptsetup_keyfile_path}'"
 if ! cryptsetup open --key-file "${cryptsetup_keyfile_path}" "${luks_target}" "${target_mappername}"
 then
@@ -947,6 +969,7 @@ then
     endScript "The target device '${target_mountpoint_path}' is not big enough (size of ${bytes_target_size_human} but ${bytes_needed_human} needed)." "error"
     exit 1 # endScript should exit, this is just a fallback
 fi
+unset bytes_target_size bytes_target_size_human
 
 
 # check if there is old backup data on the target
@@ -1016,12 +1039,15 @@ then
         exit 1 # endScript should exit, this is just a fallback
     fi
 fi
+unset bytes_available bytes_available_human
 
 
 # inform about time
 message "Current time: $(date -u)."
 message "Elapsed time: $(timeElapsed)."
 
+# init flag to keep track of errors when opt_continue_on_backuperror is set
+errors_during_backup="0"
 
 # handle the files
 if [ ${#backup_sources_cp[@]} -eq 0 ]
@@ -1067,11 +1093,21 @@ do
         cd "${pwd_save}"
         unset pwd_save
 
-        # break on error
+        # error handling
         if [ $exitcode_sha1sum -ne 0 ]
         then
-            endScript "Creating checksums file failed with exit code $exitcode_sha1sum." "error"
-            exit 1 # endScript should exit, this is just a fallback
+            errors_during_backup="1"
+            message="Creating checksums file failed with exit code $exitcode_sha1sum."
+            # continue on error
+            if [ "${opt_continue_on_backuperror}" = "1" ]
+            then
+                message "${message}" "error"
+            # break on error
+            else
+                endScript "${message}" "error"
+                exit 1 # endScript should exit, this is just a fallback
+            fi
+            unset message
         fi
         unset exitcode_sha1sum
 
@@ -1105,11 +1141,34 @@ do
     message "Current time: $(date -u)."
     message "Elapsed time: $(timeElapsed)."
 
-    # break on error
+    # error handling
     if [ $exitcode_cp -ne 0 ]
     then
-        endScript "Copying '${source_item}'* to '${target_mountpoint_path}/${target_subdir}' failed." "error"
-        exit 1 # endScript should exit, this is just a fallback
+        errors_during_backup="1"
+        # Errors during file copy are unusual as we checked the available space upfront. Collect
+        # additional data about the target device for more useful debugging information.
+        bytes_available=$(($(df --output=avail -B 1 "${target_mountpoint_path}" | tail -n 1)+0))
+        bytes_available_human="$(numfmt --to=iec-i --suffix=B --format='%.2f' ${bytes_available})"
+        message="Copying '${source_item}'* to '${target_mountpoint_path}/${target_subdir}' failed. Available space on target: ${bytes_available_human}"
+        unset bytes_available bytes_available_human
+        if [ -n "${target_devicename}" ]
+        then
+            dmesg_target_device="$(dmesg -T -P -f 'kern' -l 'err,crit,alert,emerg' | grep "${target_devicename}" | tail -10)"
+            message="$(printf '%s\nLast ten kernel messages (err,crit,alert,emerg) related to %s (if any):\n%s\n' "${message}" "${target_devicename}" "${dmesg_target_device}")"
+            unset dmesg_target_device
+        fi
+        # continue on error
+        if [ "${opt_continue_on_backuperror}" = "1" ]
+        then
+            message "${message}" "error"
+        # break on error
+        else
+            endScript "${message}" "error"
+            exit 1 # endScript should exit, this is just a fallback
+        fi
+        unset message
+    else
+        message "The files were copied successfully."
     fi
     unset exitcode_cp
 
@@ -1138,46 +1197,65 @@ do
         IFS="${ifs_save}"; unset ifs_save # restore IFS
         unset line output_sha1sum
 
-        # break on error
+        # error handling
         if [ $exitcode_sha1sum -ne 0 ]
         then
+            errors_during_backup="1"
             # Checksum verification errors are unusual. Collect additional data about the target
             # device for more useful debugging information.
             bytes_available=$(($(df --output=avail -B 1 "${target_mountpoint_path}" | tail -n 1)+0))
             bytes_available_human="$(numfmt --to=iec-i --suffix=B --format='%.2f' ${bytes_available})"
             message="Checksum verification failed. Available space on target: ${bytes_available_human}"
+            unset bytes_available bytes_available_human
             if [ -n "${target_devicename}" ]
             then
                 dmesg_target_device="$(dmesg -T -P -f 'kern' -l 'err,crit,alert,emerg' | grep "${target_devicename}" | tail -10)"
                 message="$(printf '%s\nLast ten kernel messages (err,crit,alert,emerg) related to %s (if any):\n%s\n' "${message}" "${target_devicename}" "${dmesg_target_device}")"
+                unset dmesg_target_device
             fi
-            endScript "${message}" "error"
-            exit 1 # endScript should exit, this is just a fallback
+            # continue on error
+            if [ "${opt_continue_on_backuperror}" = "1" ]
+            then
+                message "${message}" "error"
+            # break on error
+            else
+                endScript "${message}" "error"
+                exit 1 # endScript should exit, this is just a fallback
+            fi
+            unset message
+        else
+            message "File verification was successful."
         fi
         unset exitcode_sha1sum
-        message "Verification was successful."
 
         # inform about time
         message "Current time: $(date -u)."
         message "Elapsed time: $(timeElapsed)."
     fi
 done
-message "All file operations were finished successfully."
+if [ "${errors_during_backup}" != "0" ]
+then
+    message "All file operations have been completed. There were errors during the operation!" "error"
+else
+    message "All file operations have been completed successfully."
+    # backup was successful, clean up old backup data now (best effort)
+    if [ -d "${target_mountpoint_path}/${target_subdir_old}" ]
+    then
+        message "Going to clean up the old backup data at '${target_mountpoint_path}/${target_subdir_old}'."
+        rm -rf "${target_mountpoint_path}/${target_subdir_old}" 2>/dev/null
+    fi
+fi
 unset source_item
 
 
-# backup was successful, clean up old backup data now (best effort)
-if [ -d "${target_mountpoint_path}/${target_subdir_old}" ]
-then
-    message "Going to clean up the old backup data at '${target_mountpoint_path}/${target_subdir_old}'."
-    rm -rf "${target_mountpoint_path}/${target_subdir_old}" 2>/dev/null
-fi
-
-
-# inform about time
+# inform about time and end script
 message "Current time: $(date -u)."
 message "Elapsed time: $(timeElapsed)."
-
-
-endScript "Mirroring backups to '${target_mountpoint_path}' was successful." "success"
-exit 0 # endScript should exit, this is just a fallback
+if [ "${errors_during_backup}" != "0" ]
+then
+    endScript "Mirroring backups to '${target_mountpoint_path}' has been completed with errors. Please review the logs carefully!" "error"
+    exit 1 # endScript should exit, this is just a fallback
+else
+    endScript "Mirroring backups to '${target_mountpoint_path}' has been successfully completed." "success"
+    exit 0 # endScript should exit, this is just a fallback
+fi
