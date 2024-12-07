@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Support for the [REUSE specification](https://reuse.software/spec/). The [`.reuse/dep5`](.reuse/dep5) file provides detailed licensing and copyright information in a human- and machine-readable format.
 
+- New option (-j) to allows the backup process to proceed with remaining files even if errors occur during copying or verification. (1a3584d)
+
 ### Changed
 
 - ⚠️ Changed repository URL from `https://github.com/foundata/proxmox-pve_backup_usb` to `https://github.com/foundata/proxmox-pve-backup-usb` according to [our guidelines](https://github.com/foundata/guidelines/blob/master/git-repository-naming.md). GitHub [redirects HTTP and most of the `git` actions](https://docs.github.com/en/repositories/creating-and-managing-repositories/renaming-a-repository) but executing `git remote set-url origin git@github.com:foundata/proxmox-pve-backup-usb.git` is recommended.
