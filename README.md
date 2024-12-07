@@ -372,7 +372,7 @@ Successfully closed LUKS device 'pve_backup_usb'
 
 The script should be compatible with Proxmox Virtual Environment (PVE) 7.X and newer. It was tested on:
 
-* Proxmox VE 8: 8.1.4, 8.0.4
+* Proxmox VE 8: 8.3.0, 8.1.4, 8.0.4
 * Proxmox VE 7: 7.4-16
 
 
