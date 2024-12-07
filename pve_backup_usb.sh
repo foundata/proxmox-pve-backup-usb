@@ -297,7 +297,7 @@ shift $((${OPTIND} - 1)) && OPTIND='1' # delete processed options, reset index
 ################################################################################
 if [ -z "${opt_backupcfg_list}" ]
 then
-    printf '%s: option "-b" is mandatory. Use "-h" to get usage instructions.\n' "$(basename "${0}")" 1>&2
+    printf '%s: Option "-b" is mandatory. Use "-h" to get usage instructions.\n' "$(basename "${0}")" 1>&2
     exit 2
 fi
 IFS=',' read -r -a backupcfg_array <<< "${opt_backupcfg_list}"
@@ -319,7 +319,7 @@ fi
 
 if [ -z "${opt_source_paths_pvedumps_list}" ]
 then
-    printf '%s: option "-s" is mandatory. Use "-h" to get usage instructions.\n' "$(basename "${0}")" 1>&2
+    printf '%s: Option "-s" is mandatory. Use "-h" to get usage instructions.\n' "$(basename "${0}")" 1>&2
     exit 2
 fi
 readonly source_paths_pvedumps_list="${opt_source_paths_pvedumps_list}"
@@ -670,7 +670,8 @@ function timeElapsed() {
 # Process
 ################################################################################
 
-# fallback cleanup endScript should taking care of this
+# add a trap as fallback cleanup action to prevent leftovers when the script
+# gets interrupted in an unexpected way
 trap 'syncUmountAndClose' EXIT SIGINT SIGTERM
 
 
@@ -754,7 +755,7 @@ unset path_pvedumps_source
 message "#### $(basename "${0}") ####"
 message "Current time: $(date -u)."
 message "CSV list of 'PveMachineID[:MaxBackupCount]' entries (defines what to copy): '${opt_backupcfg_list}'"
-message "Sync, unmount, and close of LUKS device (upfront safeguard against stale or previously interrupted execs)."
+message "Sync, unmount, and close of backup target device (upfront safeguard against stale or previously interrupted backup script runs)."
 syncUmountAndClose
 
 
@@ -853,9 +854,10 @@ do
     fi
     unset tuple
 
-    # detect filename prefixes (to easily search fot all files belonging to a
-    # certain backup (dump, log, notes ...) of the defined VMs). Example filenames
-    # of a backup (many parts are non-static, e.g. extension depend on backup type):
+    # Detect filename prefixes (easy search for all files belonging to a
+    # certain backup (dump, log, notes ...) of the defined VMs). Example
+    # filenames of a backup (many parts are non-static, e.g. extension
+    # depend on backup type):
     # - vzdump-qemu-120-2023_08_04-21_00_04.vma.zst
     # - vzdump-qemu-120-2023_08_04-21_00_04.vma.zst.notes
     # - vzdump-qemu-120-2023_08_09-21_00_05.log
@@ -947,7 +949,7 @@ then
 fi
 
 
-# check if there is old backup data existing on the target
+# check if there is old backup data on the target
 if [ -d "${target_mountpoint_path}/${target_subdir}" ] &&
    ! [ -n "$(find "${target_mountpoint_path}/${target_subdir}" -maxdepth 0 -empty -exec echo {} is empty. \; 2>/dev/null)" ]
 then
@@ -1047,12 +1049,14 @@ do
     message "#### Handling backup '$(basename "${source_item}")' ####"
 
     # create checksums
-    # SHA1 was chosen as it is by far the fastest on large datasets (even faster than CRC32
-    # and MD5) on modern hardware. This is especially true on CPUs like AMD EPYC or RYZEN).
-    # See the following for more information or to benchmark your machine:
+    # SHA1 was chosen as it is by far the fastest on large datasets on modern hardware
+    # (usually even faster than the easier CRC32 and MD5 because of acceleration). This
+    # is especially true on CPUs like AMD EPYC or RYZEN). See the following for more
+    # information or to benchmark your machine:
     #   $ openssl speed md5 sha1
     #   https://stackoverflow.com/a/26682952
-    # "sum" or "crc32" is also harder to handle as they do not provide built-in checking.
+    # "sum" or "crc32" is also harder to handle as these commands do not provide
+    # built-in checking/verification functionality.
     if [ "${opt_checksums}" = "1" ]
     then
         pwd_save="${PWD}" # $OLDPWD is sometimes a bit strange to handle when subshells are included
@@ -1137,8 +1141,8 @@ do
         # break on error
         if [ $exitcode_sha1sum -ne 0 ]
         then
-            # checksum verification errors are unusual. Collect additional data about the target
-            # device for more useful debugging information
+            # Checksum verification errors are unusual. Collect additional data about the target
+            # device for more useful debugging information.
             bytes_available=$(($(df --output=avail -B 1 "${target_mountpoint_path}" | tail -n 1)+0))
             bytes_available_human="$(numfmt --to=iec-i --suffix=B --format='%.2f' ${bytes_available})"
             message="Checksum verification failed. Available space on target: ${bytes_available_human}"
