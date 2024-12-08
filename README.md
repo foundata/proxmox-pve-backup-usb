@@ -90,7 +90,12 @@ Explanation:
 
 The script deletes the old backup content on the target device (after copying the new data if there is enough space to copy the new files and keep the old ones during copy operation or upfront if there is not enough space to keep both). To keep multiple revisions of the last `N` PVE dumps, you can use multiple external drives and rotate them as you wish (=disconnect the old drive, change and connect the new drive).
 
-By default, the script uses the first partition on the first USB disk it detects in `/dev/disk/by-path/`. No worries: existing drives not [prepared](#preparation-of-an-external-usb-drive) for usage won't be destroyed nor touched as the decryption will fail. However, this automatism presumes that only one USB disk is connected during the script run. Defining a UUID will work if there are more than one USB disk attached (cf. `-d` parameter).
+By default, the script searches the following locations for a partition to use as the backup target for decryption and mounting:
+
+1. The first partition labeled `pve_backup_usb` listed under `/dev/disk/by-label/`.
+2. The first partition on the first USB disk found via `/dev/disk/by-path/`.
+
+No need to worry: existing partitions or drives not [intended](#preparation-of-an-external-usb-drive) for backups will not be destroyed, as decryption will simply fail, and the script will stop. If this automated behavior does not match your environment, you can provide a custom list of disk labels or UUIDs to search before the default locations are checked (cf. `-d` parameter).
 
 
 ### Parameters
@@ -185,6 +190,7 @@ apt-get install parted cryptsetup
 parted "${TARGETDEVICE}" mktable GPT
 parted "${TARGETDEVICE}" mkpart primary 0% 100%
 cryptsetup luksFormat --cipher aes-xts-plain64 --verify-passphrase "${TARGETDEVICE}1"
+cryptsetup config "${TARGETDEVICE}1" --label "${DEVICELABEL}"
 
 # optional: add an additional fallback key. Please use a long passphrase (at least
 # 20 chars) for security and store it in your password management.

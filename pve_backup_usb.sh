@@ -33,7 +33,7 @@ set -u
 # init
 opt_backupcfg_list='' # -b
 opt_checksums='0' # -c
-opt_luks_target_uuid='' # -d
+opt_luks_targets_list='' # -d
 opt_email_to='' # -e
 opt_email_from='' # -f
 opt_email_cc='' # -g
@@ -66,12 +66,12 @@ do
             opt_checksums='1'
             ;;
 
-        # disk UUID
+        # list of disk labels or UUIDs
         'd')
-            opt_luks_target_uuid="${OPTARG}"
-            if ! printf '%s' "${opt_luks_target_uuid}" | grep -E -q -e "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            opt_luks_targets_list="${OPTARG}"
+            if [ -z "${opt_luks_targets_list}" ]
             then
-                opt_email_to=''
+                opt_luks_targets_list=''
                 printf '%s: Invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
                 exit 2
             fi
@@ -179,7 +179,7 @@ USB drives, including proper logging and optional email notifications.
 .PP
 .BI "-b " "PveID[:maxCount[,PveID:maxCount[,...]]]" ""
 .B [-c]
-.BI "[-d " "UUID of a disk to decrypt" "]"
+.BI "[-d " "pve_backup_disk_label[,UUID[,...]]"
 .BI "[-e " "email@example.com" "]"
 .BI "[-f " "email@example.org" "]"
 .BI "[-g " "email@example.com[,email@example.net[,...]]" "]"
@@ -210,15 +210,17 @@ Enable checksum creation and verification of the copies (recommended for
 safety but probably doubles the time needed for completing the backup task).
 .TP
 .B -d
-A UUID of the target partition to decrypt. Will be used to search it in
-/dev/disk/by-uuid/ (you might use 'blkid /dev/sdX1' to determine the UUID).
-By default, the script is simply using the first partition on the first USB
-disk it is able to find via /dev/disk/by-path/. No worries: existing drives
-not used for backups won't be destroyed as the decryption will fail. But this
-automatism presumes that only one USB disk is connected during the
-script run. Defining a UUID will work if there are multiple disks (e.g. when
-it is not feasible in your environment to just have one disk connected
-simultaneously).
+By default, the script searches the following locations for a partition to use
+as the backup target for decryption and mounting:
+1. The first partition labeled "pve_backup_usb" listed under /dev/disk/by-label/.
+2. The first partition on the first USB disk found via /dev/disk/by-path/.
+No need to worry: existing partitions or drives not intended for backups will
+not be destroyed, as decryption will simply fail, and the script will stop.
+If this automated behavior does not match your environment, you can provide a
+custom list of disk labels or UUIDs to search before the default locations are
+checked. Separate multiple targets with commas (CSV format). Any given UUID
+will be searched under /dev/disk/by-uuid/, while any other string matching the
+pattern "^[0-9a-zA-Z_ \-]{1,16}$" will be searched under /dev/disk/by-label/.
 .TP
 .B -e
 Email address to send notifications to. Format: 'email@example.com'.
@@ -322,12 +324,14 @@ fi
 IFS=',' read -r -a backupcfg_array <<< "${opt_backupcfg_list}"
 readonly backupcfg_array
 
-if [ -z "${opt_luks_target_uuid}" ]
+if [ -z "${opt_luks_targets_list}" ]
 then
-    readonly luks_target_uuid=""
+    readonly luks_targets_list=""
 else
-    readonly luks_target_uuid="${opt_luks_target_uuid}"
+    readonly luks_targets_list="${opt_luks_targets_list}"
 fi
+IFS=',' read -r -a luks_targets_array <<< "${luks_targets_list}"
+readonly luks_targets_array
 
 if [ -z "${opt_backup_user}" ]
 then
@@ -796,14 +800,72 @@ then
 fi
 
 
-# determine target device
+# determine target device partition
 luks_target=""
-if [ -n "${luks_target_uuid}" ]
+message="Searching for target partition at"
+for luks_target in "${luks_targets_array[@]}"
+do
+    # UUID of a partition
+    if [ -n "${luks_target}" ] &&
+       printf '%s' "${luks_target}" | grep -E -q -e "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    then
+        luks_target="/dev/disk/by-uuid/${luks_target}"
+        if [ -L "${luks_target}" ]
+        then
+            message "${message} '${luks_target}'... found."
+            break 1
+        else
+            message "${message} '${luks_target}'... not found, continuing."
+        fi
+
+    # label of a partition
+    elif [ -n "${luks_target}" ] &&
+        printf '%s' "${luks_target}" | grep -E -q -e "^[0-9a-zA-Z_ \-]{1,16}$"
+    then
+        luks_target="/dev/disk/by-label/${luks_target}"
+        if [ -L "${luks_target}" ]
+        then
+            message "${message} '${luks_target}'... found."
+            break 1
+        else
+            message "${message} '${luks_target}'... not found, continuing."
+        fi
+
+    # invalid value
+    elif [ -n "${luks_target}" ]
+    then
+        message "Invalid value '${luks_target}' (has to be a valid partition label or UUID, check '-d' parameter), continuing." "warning"
+    fi
+
+    # nothing was found (yet)
+    luks_target=""
+done
+# use the first partition with a "pve_backup_usb" label if no (useable) target was specified or found
+if [ -z "${luks_target}" ]
 then
-    luks_target="/dev/disk/by-uuid/${luks_target_uuid}"
-else
-    luks_target="/dev/$(ls -l /dev/disk/by-path/*usb*part1 | cut -f 7 -d "/" | head -n 1)"
+    luks_target="/dev/disk/by-label/pve_backup_usb"
+    if [ -L "${luks_target}" ]
+    then
+        message "${message} '${luks_target}'... found."
+    else
+        message "${message} '${luks_target}'... not found, continuing."
+    fi
 fi
+# use the first partition of the first usb storage device if no (useable) target was specified or found
+if [ -z "${luks_target}" ]
+then
+
+    luks_target="/dev/$(ls -l /dev/disk/by-path/*usb*part1 | cut -f 7 -d "/" | head -n 1)"
+    if [ -b "${luks_target}" ]
+    then
+        message "${message} '${luks_target}'... found."
+    else
+        message "${message} '${luks_target}'... not found."
+        endScript "Could not determine any target partition for decryption (backup storage device available?)." "error"
+        exit 1 # endScript should exit, this is just a fallback
+    fi
+fi
+unset message
 
 
 # unlock target device
@@ -1097,7 +1159,7 @@ do
         if [ $exitcode_sha1sum -ne 0 ]
         then
             errors_during_backup="1"
-            message="Creating checksums file failed with exit code $exitcode_sha1sum."
+            message="Creating checksums file failed with exit code ${exitcode_sha1sum}."
             # continue on error
             if [ "${opt_continue_on_backuperror}" = "1" ]
             then
