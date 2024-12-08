@@ -6,13 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [unreleased]
+## [1.3.0] - 2024-12-08
+
+### Added
+
+- Enhanced `-d` parameter: Added support for custom disk labels or UUIDs to override default locations. Multiple targets can be specified as a CSV list. (a9699ab)
+
 
 ### Changed
 
-- Improved automated search for backup target partitions: The script now also searches for the first partition labeled `pve_backup_usb` under `/dev/disk/by-label/`.
-
-- Enhanced `-d` parameter: Added support for custom disk labels or UUIDs to override default locations. Multiple targets can be specified as a CSV list.
+- Improved automated search for backup target partitions: The script now also searches for the first partition labeled `pve_backup_usb` under `/dev/disk/by-label/`. (a9699ab)
 
 
 ## [1.2.0] - 2024-12-07
@@ -81,7 +84,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All functionality and files.
 
 
-[unreleased]: https://github.com/foundata/proxmox-pve-backup-usb/compare/v1.2.0...HEAD
+[unreleased]: https://github.com/foundata/proxmox-pve-backup-usb/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/foundata/proxmox-pve-backup-usb/releases/tag/v1.2.0
 [1.2.0]: https://github.com/foundata/proxmox-pve-backup-usb/releases/tag/v1.2.0
 [1.1.3]: https://github.com/foundata/proxmox-pve-backup-usb/releases/tag/v1.1.3
 [1.1.2]: https://github.com/foundata/proxmox-pve-backup-usb/releases/tag/v1.1.2
