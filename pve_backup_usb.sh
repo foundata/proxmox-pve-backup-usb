@@ -210,17 +210,21 @@ Enable checksum creation and verification of the copies (recommended for
 safety but probably doubles the time needed for completing the backup task).
 .TP
 .B -d
-By default, the script searches the following locations for a partition to use
-as the backup target for decryption and mounting:
+List of partition labels or UUIDs to search before the default locations are
+checked for the backup target partion. By default, the script searches the
+following locations for a partition to use as the backup target for decryption
+and mounting:
 1. The first partition labeled "pve_backup_usb" listed under /dev/disk/by-label/.
 2. The first partition on the first USB disk found via /dev/disk/by-path/.
-No need to worry: existing partitions or drives not intended for backups will
-not be destroyed, as decryption will simply fail, and the script will stop.
 If this automated behavior does not match your environment, you can provide a
-custom list of disk labels or UUIDs to search before the default locations are
-checked. Separate multiple targets with commas (CSV format). Any given UUID
-will be searched under /dev/disk/by-uuid/, while any other string matching the
-pattern "^[0-9a-zA-Z_ \-]{1,16}$" will be searched under /dev/disk/by-label/.
+custom list of partition labels or UUIDs to search before using this parameter.
+Separate multiple targets with commas (CSV format). Any given UUID will be
+searched under /dev/disk/by-uuid/ (you might use "blkid /dev/sdX1" to determine
+a UUID), while any other string matching the pattern "^[0-9a-zA-Z_ \-]{1,16}$"
+will be searched under /dev/disk/by-label/. The search will be performed in the
+exact order the items appear in the list. No need to worry: existing partitions
+or drives not intended for backups will not be destroyed, as decryption will
+simply fail, and the script will stop.
 .TP
 .B -e
 Email address to send notifications to. Format: 'email@example.com'.
