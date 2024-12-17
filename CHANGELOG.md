@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.4.0] - 2024-12-17
+
+### Added
+
+- Added `-v` parameter: Print the script's version number, then exit. (c72ac68, ae1f2ff)
+
+### Fixed
+
+- Fix automatic detection of unlabeled LUKS drives as backup targets (regression introduced with v1.3.0) (0afe1ef)
+
+
 ## [1.3.0] - 2024-12-08
 
 ### Added
@@ -83,7 +94,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All functionality and files.
 
 
-[unreleased]: https://github.com/foundata/proxmox-pve-backup-usb/compare/v1.3.0...HEAD
+[unreleased]: https://github.com/foundata/proxmox-pve-backup-usb/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/foundata/proxmox-pve-backup-usb/releases/tag/v1.4.0
 [1.3.0]: https://github.com/foundata/proxmox-pve-backup-usb/releases/tag/v1.3.0
 [1.2.0]: https://github.com/foundata/proxmox-pve-backup-usb/releases/tag/v1.2.0
 [1.1.3]: https://github.com/foundata/proxmox-pve-backup-usb/releases/tag/v1.1.3

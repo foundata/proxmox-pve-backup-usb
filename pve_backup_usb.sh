@@ -21,7 +21,7 @@
 ################################################################################
 
 # version of the script
-readonly version='1.3.0-devel'
+readonly version='1.4.0'
 
 
 
