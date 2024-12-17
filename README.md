@@ -59,6 +59,9 @@ cat "/usr/local/bin/pve_backup_usb.sh"
 # take care about owner and permissions
 chown "root:root" "/usr/local/bin/pve_backup_usb.sh"
 chmod 0755 "/usr/local/bin/pve_backup_usb.sh"
+
+# print the script's version number
+/usr/local/bin/pve_backup_usb.sh -v
 ```
 
 
@@ -123,6 +126,7 @@ No need to worry: existing partitions or drives not [intended](#preparation-of-a
 * `-l`: Name used for handling LUKS via `/dev/mapper/` and creating a mountpoint subdirectory at `/media/`. Defaults to `pve_backup_usb`. 16 alphanumeric chars at max.
 * `-q`: Flag to enable quiet mode. Emails will be sent only on `error` or `warning` then (but not on `info` or `success`).
 * `-u`: Username of the account used to run the backups. Defaults to `root`. The script checks if the correct user is calling it and permissions of e.g. the keyfile are fitting or are too permissive. The user also needs permissions to mount devices. Running the script as `root` is propably a good choice for most environments.
+* `-v`: Print the script's version number, then exit.
 
 
 ### Cronjob example

@@ -300,8 +300,7 @@ for most environments.
 Print this help.
 .TP
 .B -v
-Print the script's version.
-
+Print the script's version number, then exit.
 
 .SH EXIT STATUS
 This program returns an exit status of zero if it succeeds. Non zero
