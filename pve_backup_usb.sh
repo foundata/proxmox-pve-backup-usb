@@ -820,6 +820,8 @@ do
             break 1
         else
             message "${message} '${luks_target}'... not found, continuing."
+            # nothing was found (yet)
+            luks_target=""
         fi
 
     # label of a partition
@@ -833,6 +835,8 @@ do
             break 1
         else
             message "${message} '${luks_target}'... not found, continuing."
+            # nothing was found (yet)
+            luks_target=""
         fi
 
     # invalid value
@@ -840,9 +844,6 @@ do
     then
         message "Invalid value '${luks_target}' (has to be a valid partition label or UUID, check '-d' parameter), continuing." "warning"
     fi
-
-    # nothing was found (yet)
-    luks_target=""
 done
 # use the first partition with a "pve_backup_usb" label if no (useable) target was specified or found
 if [ -z "${luks_target}" ]
@@ -853,12 +854,13 @@ then
         message "${message} '${luks_target}'... found."
     else
         message "${message} '${luks_target}'... not found, continuing."
+        # nothing was found (yet)
+        luks_target=""
     fi
 fi
 # use the first partition of the first usb storage device if no (useable) target was specified or found
 if [ -z "${luks_target}" ]
 then
-
     luks_target="/dev/$(ls -l /dev/disk/by-path/*usb*part1 | cut -f 7 -d "/" | head -n 1)"
     if [ -b "${luks_target}" ]
     then
