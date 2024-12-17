@@ -47,7 +47,7 @@ opt_backup_user='' # -u
 # parse options
 opt=''
 OPTIND='1'
-while getopts ':qb:cd:e:f:g:hjl:s:u:' opt
+while getopts ':b:cd:e:f:g:hjk:l:qs:u:' opt
 do
     case "${opt}" in
         # backup config
@@ -138,6 +138,11 @@ do
             fi
             ;;
 
+        # quiet mode
+        'q')
+            opt_quiet='1'
+            ;;
+
         # source dirs
         's')
             opt_source_paths_pvedumps_list="${OPTARG}"
@@ -158,11 +163,6 @@ do
                 printf '%s: Invalid value for "%s", ignoring it.\n' "$(basename "${0}")" "${opt}" 1>&2
                 exit 2
             fi
-            ;;
-
-        # quiet mode
-        'q')
-            opt_quiet='1'
             ;;
 
         # show help
@@ -820,8 +820,7 @@ do
             break 1
         else
             message "${message} '${luks_target}'... not found, continuing."
-            # nothing was found (yet)
-            luks_target=""
+            luks_target="" # nothing was found (yet)
         fi
 
     # label of a partition
@@ -835,8 +834,7 @@ do
             break 1
         else
             message "${message} '${luks_target}'... not found, continuing."
-            # nothing was found (yet)
-            luks_target=""
+            luks_target="" # nothing was found (yet)
         fi
 
     # invalid value
@@ -854,8 +852,7 @@ then
         message "${message} '${luks_target}'... found."
     else
         message "${message} '${luks_target}'... not found, continuing."
-        # nothing was found (yet)
-        luks_target=""
+        luks_target="" # nothing was found (yet)
     fi
 fi
 # use the first partition of the first usb storage device if no (useable) target was specified or found
@@ -867,6 +864,7 @@ then
         message "${message} '${luks_target}'... found."
     else
         message "${message} '${luks_target}'... not found."
+        luks_target="" # nothing was found (yet)
         endScript "Could not determine any target partition for decryption (backup storage device available?)." "error"
         exit 1 # endScript should exit, this is just a fallback
     fi
