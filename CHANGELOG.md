@@ -12,7 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Enhanced `-d` parameter: Added support for custom disk labels or UUIDs to override default locations. Multiple targets can be specified as a CSV list. (a9699ab)
 
-
 ### Changed
 
 - Improved automated search for backup target partitions: The script now also searches for the first partition labeled `pve_backup_usb` under `/dev/disk/by-label/`. (a9699ab)
@@ -30,25 +29,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - ⚠️ Changed repository URL from `https://github.com/foundata/proxmox-pve_backup_usb` to `https://github.com/foundata/proxmox-pve-backup-usb` according to [our guidelines](https://github.com/foundata/guidelines/blob/master/git-repository-naming.md). GitHub [redirects HTTP and most of the `git` actions](https://docs.github.com/en/repositories/creating-and-managing-repositories/renaming-a-repository) but executing `git remote set-url origin git@github.com:foundata/proxmox-pve-backup-usb.git` is recommended.
 
-- Better error messages (dmesg), e.g. provide useful information in the script's log about hardware failures (94b68df)
+- Better error messages (dmesg), e.g. provide useful information in the script's log about hardware failures. (94b68df)
 
 
 ## [1.1.3] - 2023-09-10
 
-### Fixed
-
-- Fix error preventing copying even if there is enough space on the target in some situations (559eb10)
-
 ### Changed
 
 - Undo moving old dumps on target device if deleting them would not free up sufficient space. (c2a741f)
+
+### Fixed
+
+- Fix error preventing copying even if there is enough space on the target in some situations. (559eb10)
 
 
 ## [1.1.2] - 2023-08-30
 
 ### Fixed
 
-- Fix regression, preventing email notification on success (085047d)
+- Fix regression, preventing email notification on success. (085047d)
 
 
 ## [1.1.1] - 2023-08-23
@@ -62,11 +61,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Introduce "warning" as message type (5436f18)
+- Introduce "warning" as message type. (5436f18)
 
 ### Changed
 
-- "warning" if there were no backups to copy (was "error" before) (5436f18)
+- "warning" if there were no backups to copy (was "error" before). (5436f18)
 - Introduce `pve_backup_usb_` as prefix for tempfile. Makes it easier to look a the logfile's content during exec. (5436f18)
 
 
@@ -85,7 +84,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 [unreleased]: https://github.com/foundata/proxmox-pve-backup-usb/compare/v1.3.0...HEAD
-[1.3.0]: https://github.com/foundata/proxmox-pve-backup-usb/releases/tag/v1.2.0
+[1.3.0]: https://github.com/foundata/proxmox-pve-backup-usb/releases/tag/v1.3.0
 [1.2.0]: https://github.com/foundata/proxmox-pve-backup-usb/releases/tag/v1.2.0
 [1.1.3]: https://github.com/foundata/proxmox-pve-backup-usb/releases/tag/v1.1.3
 [1.1.2]: https://github.com/foundata/proxmox-pve-backup-usb/releases/tag/v1.1.2
