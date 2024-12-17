@@ -17,6 +17,15 @@
 
 
 ################################################################################
+# Miscellaneous constants and global values
+################################################################################
+
+# version of the script
+readonly version='1.3.0-devel'
+
+
+
+################################################################################
 # Environment
 ################################################################################
 PATH='/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin'
@@ -43,11 +52,12 @@ opt_target_mappername='' # -l
 opt_quiet='0' # -q
 opt_source_paths_pvedumps_list='' # -s
 opt_backup_user='' # -u
+opt_show_version='0' # -v
 
 # parse options
 opt=''
 OPTIND='1'
-while getopts ':b:cd:e:f:g:hjk:l:qs:u:' opt
+while getopts ':b:cd:e:f:g:hjk:l:qs:u:v' opt
 do
     case "${opt}" in
         # backup config
@@ -165,6 +175,13 @@ do
             fi
             ;;
 
+        # show version flag
+        'v')
+            opt_show_version='1' # flag currently not being used, but still setting the value for code consistency
+            printf '%s\n' "${version}"
+            exit 0
+            ;;
+
         # show help
         'h')
             filename="$(basename "${0}")"
@@ -186,9 +203,10 @@ USB drives, including proper logging and optional email notifications.
 .B [-j]
 .BI "[-k " "/path/to/keyfile" "]"
 .BI "[-l " "mapper and mount point name" "]"
+.B [-q]
 .BI "[-s " "/pve1/dumps[:/pve2/dumps:...]" "]"
 .BI "[-u " "username" "]"
-.B [-q]
+.B [-v]
 
 .SH DESCRIPTION
 See https://github.com/foundata/proxmox-pve-backup-usb/ for a detailed
@@ -263,6 +281,10 @@ Name used for handling LUKS via /dev/mapper/ and creating a mountpoint
 subdirectory at /media/. Defaults to "pve_backup_usb".
 16 alphanumeric chars at max.
 .TP
+.B -q
+Flag to enable quiet mode. Emails will be sent only on "error" or "warning"
+then (but not on "info" or "success").
+.TP
 .B -s
 List of one or more directories to search for PVE dumps, without trailing
 slash, separated by ":"; Example: "/pve1/dumps:/pve2/dumps".
@@ -277,9 +299,8 @@ for most environments.
 .B -h
 Print this help.
 .TP
-.B -q
-Flag to enable quiet mode. Emails will be sent only on "error" or "warning"
-then (but not on "info" or "success").
+.B -v
+Print the script's version.
 
 
 .SH EXIT STATUS

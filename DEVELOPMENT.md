@@ -18,8 +18,9 @@ Nothing special or automated yet. Therefore just some hints for manual testing:
 
 1. Do proper [Testing](#testing). Continue only if everything is fine.
 2. Determine the next version number. This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-3. Update the [`CHANGELOG.md`](./CHANGELOG.md). Insert a section for the new release. Do not forget the comparison link at the end of the file.
-4. If everything is fine: commit the changes, tag the release and push:
+3. Update the internal version variable `readonly version=` to match the new release version.
+4. Update the [`CHANGELOG.md`](./CHANGELOG.md). Insert a section for the new release. Do not forget the comparison link at the end of the file.
+5. If everything is fine: commit the changes, tag the release and push:
    ```console
    git tag v<version> <commit> -m "version <version>"
    git show v<version>
@@ -31,10 +32,10 @@ Nothing special or automated yet. Therefore just some hints for manual testing:
    git push origin :refs/tags/v<version> # delete the old tag remotely
    ```
    This is *only* possible if there was no [GitHub release](https://github.com/foundata/proxmox-pve-backup-usb/releases/). Use a new patch version number otherwise.
-5. Use [GitHub's release feature](https://github.com/foundata/proxmox-pve-backup-usb/releases/new), select the tag you pushed and create a new release:
+6. Use [GitHub's release feature](https://github.com/foundata/proxmox-pve-backup-usb/releases/new), select the tag you pushed and create a new release:
    * Use `v<version>` as title
    * A description is optional. In doubt, use `See CHANGELOG.md for more information about this release.`
-6. Check if the GitHub API delivers the correct version as `latest`:
+7. Check if the GitHub API delivers the correct version as `latest`:
    ```console
    curl -s -L https://api.github.com/repos/foundata/proxmox-pve-backup-usb/releases/latest | jq -r '.tag_name' | sed -e 's/^v//g'
    ```
