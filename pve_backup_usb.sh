@@ -1319,6 +1319,7 @@ do
         message "Elapsed time: $(timeElapsed)."
     fi
 done
+message ""
 if [ "${errors_during_backup}" != "0" ]
 then
     message "All file operations have been completed. There were errors during the operation!" "error"
@@ -1335,6 +1336,7 @@ unset source_item
 
 
 # inform about time and end script
+message ""
 message "Current time: $(date -u)."
 message "Elapsed time: $(timeElapsed)."
 if [ "${errors_during_backup}" != "0" ]
