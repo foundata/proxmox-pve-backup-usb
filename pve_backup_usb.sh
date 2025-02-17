@@ -11,7 +11,7 @@
 # https://github.com/foundata/proxmox-pve-backup-usb/blob/main/README.md
 #
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: foundata GmbH <https://foundata.com>
+# SPDX-FileCopyrightText: foundata GmbH (https://foundata.com)
 ################################################################################
 
 

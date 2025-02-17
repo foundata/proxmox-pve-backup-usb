@@ -1,7 +1,7 @@
 version = 1
 SPDX-PackageName = "pve_backup_usb.sh - Script to copy local PVE backup dumps to encrypted USB disks"
 SPDX-PackageDownloadLocation = "https://github.com/foundata/proxmox-pve-backup-usb"
-SPDX-PackageSupplier = "foundata GmbH <https://foundata.com>"
+SPDX-PackageSupplier = "foundata GmbH (https://foundata.com)"
 SPDX-PackageComment = """
 This project may include calls to Application Programming Interfaces
 ("API calls"), as well as their respective specifications and code that
@@ -16,5 +16,5 @@ supersede any terms of these additional agreements.
 [[annotations]]
 path = "**"
 precedence = "closest"
-SPDX-FileCopyrightText = "foundata GmbH <https://foundata.com>"
+SPDX-FileCopyrightText = "foundata GmbH (https://foundata.com)"
 SPDX-License-Identifier = "Apache-2.0"
