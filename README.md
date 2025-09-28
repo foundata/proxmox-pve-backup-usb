@@ -1,12 +1,40 @@
-# `pve_backup_usb.sh` - Script to copy local PVE backup dumps to encrypted USB disks
+# `pve_backup_usb.sh`
 
-**This project is *not* associated with Proxmox Server Solutions GmbH nor the official [Proxmox Virtual Environment (PVE)](https://www.proxmox.com/en/proxmox-virtual-environment/overview) project.** Please [report any bugs or suggestions to us](./CONTRIBUTING.md), do NOT use the official Proxmox support channels.
-
----
+**Script to copy local PVE backup dumps to encrypted USB disks**
 
 `pve_backup_usb.sh` is a script for smaller environments without dedicated [Proxmox Backup Server](https://www.proxmox.com/en/proxmox-backup-server/overview). It helps you to copy PVE dumps (created using the [built-in backup functionality](https://pve.proxmox.com/wiki/Backup_and_Restore) stored on a PVE Host) to external, encrypted USB drives for offsite disaster backups.
 
-**Features:**
+
+<div align="center" id="project-readme-header">
+<br>
+<br>
+
+**⭐ Found this useful? Support open-source and star this project:**
+
+[![GitHub repository](https://img.shields.io/github/stars/foundata/proxmox-pve-backup-usb.svg)](https://github.com/foundata/proxmox-pve-backup-usb)
+
+<br>
+</div>
+
+## Table of contents<a id="toc"></a>
+
+- [Installation](#installation)
+- [Updating](#updating)
+- [Usage](#usage)
+  - [Parameters](#usage-parameters)
+  - [Cronjob example](#usage-cronjob)
+  - [Preparation of an external USB drive](#usage-prepare-drive)
+  - [Logging](#usage-log)
+    - [Logfile](#usage-log-file)
+    - [systemd journal](#usage-log-systemd-journal)
+    - [Example logfile](#usage-logfile-example)
+- [Compatibility](#compatibility)
+- [Contributing](#contributing)
+- [Licensing, copyright](#licensing-copyright)
+- [Author information](#author-information)
+
+
+## Features<a id="features"></a>
 
 * Easy selection of PVE dumps to copy (including the limitation of „only the N newest ones of machine X“).
 * Can search multiple backup source directories for PVE dumps.
@@ -15,25 +43,7 @@
 * Robust error handling and checks (e.g. available space on target, prevent parallel execution and so on).
 
 
-## Table of Contents
-
-- [Installation](#installation)
-- [Updating](#updating)
-- [Usage](#usage)
-  - [Parameters](#parameters)
-  - [Cronjob example](#cronjob-example)
-  - [Preparation of an external USB drive](#preparation-of-an-external-usb-drive)
-  - [Logging](#logging)
-    - [Logfile](#logfile)
-    - [systemd journal](#systemd-journal)
-    - [Example logfile](#example-logfile)
-- [Compatibility](#compatibility)
-- [Contributing](#contributing)
-- [Licensing, copyright](#licensing-copyright)
-- [Author information](#author-information)
-
-
-## Installation
+## Installation<a id="installation"></a>
 
 Simply store [`pve_backup_usb.sh`](./pve_backup_usb.sh) where you like and make it executable. `/usr/local/bin/pve_backup_usb.sh` is usually a good place.
 
@@ -65,12 +75,12 @@ chmod 0755 "/usr/local/bin/pve_backup_usb.sh"
 ```
 
 
-## Updating
+## Updating<a id="updating"></a>
 
 Updating is as simple as overwriting the old script file. Just follow the [installation instructions](#installation) to get the latest release. This should be a low-risk operation as there were no backwards-compatibility-breaking releases yet (for example, all existing releases handle the target storage the same way).
 
 
-## Usage
+## Usage<a id="usage"></a>
 
 Example call:
 
@@ -101,7 +111,7 @@ By default, the script searches the following locations for a partition to use a
 No need to worry: existing partitions or drives not [intended](#preparation-of-an-external-usb-drive) for backups will not be destroyed, as decryption will simply fail, and the script will stop. If this automated behavior does not match your environment, you can provide a custom list of partition labels or UUIDs to search before the default locations are checked (cf. `-d` parameter).
 
 
-### Parameters
+### Parameters<a id="usage-parameters"></a>
 
 **Mandatory:**
 
@@ -129,7 +139,7 @@ No need to worry: existing partitions or drives not [intended](#preparation-of-a
 * `-v`: Print the script's version number, then exit.
 
 
-### Cronjob example
+### Cronjob example<a id="usage-cronjob"></a>
 
 The easiest way to get a rotation in place and use this script is a cronjob. For example, place something like the following via `crontab -e` in the crontab of `root`:
 
@@ -150,7 +160,7 @@ Explanation:
 * `-g`: Email the backup report (as CC) to `admin2@example.com` and `admin3@example.com`.
 
 
-### Preparation of an external USB drive
+### Preparation of an external USB drive<a id="usage-prepare-drive"></a>
 
 An external USB drive has to be prepared before using it as storage target for PVE dump copies:
 
@@ -253,9 +263,9 @@ dmsetup ls --target "crypt"
 ```
 
 
-### Logging
+### Logging<a id="usage-log"></a>
 
-#### Logfile
+#### Logfile<a id="usage-log-file"></a>
 
 The detailled logfile of a script run will be copied beside the mirrored backups and is named after the script's filename plus `.log` extension. By default, this is `/media/pve_backup_usb/dump/pve_backup_usb.sh.log`.
 
@@ -268,7 +278,7 @@ The logfile is handled as temporary file during the script execution and placed 
 If you are using email notifications (cf. `-e`, `-f` and `-g` parameters), the complete logfile content will be added to the email message automatically.
 
 
-#### systemd journal
+#### systemd journal<a id="usage-log-systemd-journal"></a>
 
 The script logs with its own filename as `SYSLOG_IDENTIFIER`. So by default, you can filter with `pve_backup_usb.sh` as follows:
 
@@ -302,7 +312,7 @@ journalctl -o "json" --no-pager -g "pve_backup_usb" -r | jq -C . | less
 ```
 
 
-#### Example logfile
+#### Example logfile<a id="usage-logfile-example"></a>
 
 Running the command
 
@@ -379,25 +389,26 @@ Successfully closed LUKS device 'pve_backup_usb'
 ```
 
 
-## Compatibility
+## Compatibility<a id="compatibility"></a>
 
 The script should be compatible with Proxmox Virtual Environment (PVE) 7.X and newer. It was tested on:
 
+* Proxmox VE 9: 9.0.0, 9.0.1
 * Proxmox VE 8: 8.3.0, 8.1.4, 8.0.4
 * Proxmox VE 7: 7.4-16
 
 
-## Contributing
+## Contributing<a id="contributing"></a>
 
 See [`CONTRIBUTING.md`](./CONTRIBUTING.md) if you want to get involved.
 
 The script's functionality is mature, so there might be little activity on the repository in the future. Don't get fooled by this, the project is under active maintenance and used daily by the maintainers.
 
 
-## Licensing, copyright
+## Licensing, copyright<a id="licensing-copyright"></a>
 
 <!--REUSE-IgnoreStart-->
-Copyright (c) 2023, 2024 foundata GmbH (https://foundata.com)
+Copyright (c) 2023-2025 foundata GmbH (https://foundata.com)
 
 This project is licensed under the Apache License 2.0 (SPDX-License-Identifier: `Apache-2.0`), see [`LICENSES/Apache-2.0.txt`](LICENSES/Apache-2.0.txt) for the full text.
 
@@ -407,6 +418,8 @@ The [`REUSE.toml`](REUSE.toml) file provides detailed licensing and copyright in
 [![REUSE status](https://api.reuse.software/badge/github.com/foundata/proxmox-pve-backup-usb)](https://api.reuse.software/info/github.com/foundata/proxmox-pve-backup-usb)
 
 
-## Author information
+## Author information<a id="author-information"></a>
 
 This project was created and is maintained by [foundata](https://foundata.com/). If you like it, you might [buy them a coffee](https://buy-me-a.coffee/proxmox-pve-backup-usb/).
+
+`pve_backup_usb.sh` is *not* associated with Proxmox Server Solutions GmbH nor the official [Proxmox Virtual Environment (PVE)](https://www.proxmox.com/en/proxmox-virtual-environment/overview) project.
