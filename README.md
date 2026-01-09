@@ -1,6 +1,6 @@
 # `pve_backup_usb.sh`
 
-**Script to copy local PVE backup dumps to encrypted USB disks**
+**Script to copy local PVE backup dumps to encrypted USB disks.**
 
 `pve_backup_usb.sh` is a script for smaller environments without dedicated [Proxmox Backup Server](https://www.proxmox.com/en/proxmox-backup-server/overview). It helps you to copy PVE dumps (created using the [built-in backup functionality](https://pve.proxmox.com/wiki/Backup_and_Restore) stored on a PVE Host) to external, encrypted USB drives for offsite disaster backups.
 
@@ -408,7 +408,7 @@ The script's functionality is mature, so there might be little activity on the r
 ## Licensing, copyright<a id="licensing-copyright"></a>
 
 <!--REUSE-IgnoreStart-->
-Copyright (c) 2023-2025 foundata GmbH (https://foundata.com)
+Copyright (c) 2023-2026 [foundata GmbH](https://foundata.com/) (https://foundata.com)
 
 This project is licensed under the Apache License 2.0 (SPDX-License-Identifier: `Apache-2.0`), see [`LICENSES/Apache-2.0.txt`](LICENSES/Apache-2.0.txt) for the full text.
 
@@ -420,6 +420,6 @@ The [`REUSE.toml`](REUSE.toml) file provides detailed licensing and copyright in
 
 ## Author information<a id="author-information"></a>
 
-This project was created and is maintained by [foundata](https://foundata.com/). If you like it, you might [buy them a coffee](https://buy-me-a.coffee/proxmox-pve-backup-usb/).
+This [project](https://foundata.com/en/projects/) was created and is maintained by [foundata](https://foundata.com/). If you like it, you might [buy them a coffee](https://buy-me-a.coffee/proxmox-pve-backup-usb/).
 
 `pve_backup_usb.sh` is *not* associated with Proxmox Server Solutions GmbH nor the official [Proxmox Virtual Environment (PVE)](https://www.proxmox.com/en/proxmox-virtual-environment/overview) project.
